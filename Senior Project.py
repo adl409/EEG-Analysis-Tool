@@ -1,34 +1,58 @@
-# Import necessary libraries
 import pandas as pd
+import tensorflow as tf
+import os
+from tensorflow.keras.layers import Conv2D, Flatten, Dense
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 
-# List of Excel file paths
-file_paths = ['data1.xlsx', 'data2.xlsx', 'data3.xlsx']  # Replace with the paths to your Excel files
+dir = "250ms/"
 
-# Initialize an empty DataFrame to store the combined data
-combined_data = pd.DataFrame()
+results = []
 
-# Loop through each Excel file and load the data
-for file_path in file_paths:
-    df = pd.read_excel(file_path, engine='openpyxl')
-    combined_data = combined_data.append(df, ignore_index=True)
+for filename in os.listdir(dir):
+    if filename.endswith(".xlsx"):
+        excel_file = pd.Excelfile(os.path.join(dir, filename))
 
-# Assuming the last column contains the target variable and the rest are features
-X = combined_data.iloc[:, :-1]
-y = combined_data.iloc[:, -1]
+        for sheet_name in excel_file.sheet_names:
+            data = excel_file.parse(sheet_name)
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Create and train a machine learning model (Random Forest Classifier in this example)
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+            X = data.drop(columns=['label'])
+            y = data['label']
 
-# Make predictions on the test data
-y_pred = model.predict(X_test)
+             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Evaluate the model's performance (e.g., accuracy)
-from sklearn.metrics import accuracy_score
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
+            # Preprocess EEG data (you may need to apply additional preprocessing steps)
+            # Example: Normalize the data
+            X_train_normalized = (X_train - X_train.mean()) / X_train.std()
+            X_test_normalized = (X_test - X_train.mean()) / X_train.std()
+
+            # Convert data to NumPy arrays
+            X_train_array = X_train_normalized.to_numpy()
+            X_test_array = X_test_normalized.to_numpy()
+            y_train_array = y_train.to_numpy()
+            y_test_array = y_test.to_numpy()
+
+            # Reshape the data for a CNN model
+            X_train_array = X_train_array.reshape(-1, num_channels, num_time_samples, 1)
+            X_test_array = X_test_array.reshape(-1, num_channels, num_time_samples, 1)
+
+            # Define a simple CNN model
+            model = tf.keras.Sequential([
+                Conv2D(32, (3, 3), activation='relu', input_shape=(num_channels, num_time_samples, 1)),
+                Flatten(),
+                Dense(128, activation='relu'),
+                Dense(num_classes, activation='softmax')
+            ])
+
+            # Compile the model
+            model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+            # Train the model
+            model.fit(X_train_array, y_train_array, epochs=10, batch_size=32)
+
+            # Evaluate Model
+            test_loss, test_acc = model.evaluate(X_test_array, y_test_array)
+            print(f'Test accuracy for dataset {sheet_name} in file {filename}: {test_acc}')
+
+            # Store the results
+            model_results.append((filename, sheet_name, test_acc, model))
