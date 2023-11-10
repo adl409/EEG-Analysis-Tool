@@ -4,16 +4,7 @@ import os
 from tensorflow.keras.layers import Conv2D, Flatten, Dense
 from sklearn.model_selection import train_test_split
 
-dir = "250ms/"
-
-results = []
-
-for filename in os.listdir(dir):
-    if filename.endswith(".xlsx"):
-        excel_file = pd.Excelfile(os.path.join(dir, filename))
-
-        for sheet_name in excel_file.sheet_names:
-            data = excel_file.parse(sheet_name)
+ result = []
 
 
             X = data.drop(columns=['label'])
