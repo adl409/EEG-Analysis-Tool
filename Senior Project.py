@@ -24,12 +24,12 @@ from sklearn.model_selection import train_test_split
             y_test_array = y_test.to_numpy()
 
             # Reshape the data for a CNN model
-            X_train_array = X_train_array.reshape(-1, num_channels, num_time_samples, 1)
-            X_test_array = X_test_array.reshape(-1, num_channels, num_time_samples, 1)
+            X_train_array = X_train_array.reshape(-1, 64, 128, 1)
+            X_test_array = X_test_array.reshape(-1, 64, 128, 1)
 
             # Define a simple CNN model
             model = tf.keras.Sequential([
-                Conv2D(32, (3, 3), activation='relu', input_shape=(num_channels, num_time_samples, 1)),
+                Conv2D(32, (3, 3), activation='relu', input_shape=(64, 128, 1)),
                 Flatten(),
                 Dense(128, activation='relu'),
                 Dense(num_classes, activation='softmax')
