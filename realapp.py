@@ -2,6 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox
 from PySide6.QtCore import QRegularExpression
 from PySide6.QtGui import QRegularExpressionValidator
+import os
 
 class ConfigureAddLayerDialog(QDialog):
     def __init__(self, parent=None):
@@ -112,13 +113,13 @@ class ConfigureInputDialog(QDialog):
 
         # File selection components
         file_selection_layout = QHBoxLayout()
-        self.file_path_label = QLabel("No file selected")
+        self.file_path_label = QLabel("No directory selected")
         self.file_path_label.setWordWrap(True)  # Allow label to wrap if path is too long
-        select_file_button = QPushButton("Select File")
+        select_file_button = QPushButton("Select Directory")
         file_selection_layout.addWidget(select_file_button)
         file_selection_layout.addWidget(self.file_path_label, 1)  # The '1' makes the label expandable
 
-        select_file_button.clicked.connect(self.selectFile)
+        select_file_button.clicked.connect(self.selectDirectory)
 
         layout.addLayout(file_selection_layout)
 
@@ -146,11 +147,11 @@ class ConfigureInputDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
-    def selectFile(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select file")
-        if file_path:  # Only update the label if a file was selected
-            self.file_path_label.setText(file_path)
+    def selectDirectory(self):
 
+        file_path = QFileDialog.getExistingDirectory(self, "Select directory")
+        if file_path:  # Only update the label if a file path was selected
+            self.file_path_label.setText(file_path)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -213,6 +214,29 @@ class MainWindow(QMainWindow):
     def openAddLayerModal(self):
         dialog = AddLayerDialog(self)
         dialog.exec()
+
+def parseData(rootPath):
+
+    labelledData = []
+    visited = set()
+
+    for participant in os.listdir(rootPath):
+
+        labels = os.path.join(rootPath, participant)
+    
+        for i, label in enumerate(os.listdir(labels)):
+            if label not in visited:
+                data = [[], label]
+                labelledData.append(data)
+                visited.add(label)
+
+            files = os.path.join(labels, label)
+            for file in os.listdir(files):
+                updatedPath = os.path.join(files, file)
+
+                labelledData[i][0].append(updatedPath)
+
+    return labelledData
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
