@@ -1,0 +1,358 @@
+import sys
+from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox
+from PySide6.QtCore import QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
+
+class ConfigureAddLayerDialog(QDialog):
+    def __init__(self, layer_type, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Configure Layer")
+
+        self.layer_type = layer_type  # Store the selected layer type
+
+        layout = QVBoxLayout(self)
+
+        # Create and customize widgets based on layer type
+        if self.layer_type == "Dense":
+            self.configureDenseLayer(layout)
+        elif self.layer_type == "Flatten":
+            self.configureFlattenLayer(layout)
+        elif self.layer_type == "Zero Padding 2d":
+            self.configureZeroPadding2dLayer(layout)
+        elif self.layer_type == "Average Pooling 2d":
+            self.configureAveragePooling2dLayer(layout)
+        elif self.layer_type == "Max Pooling 2d":
+            self.configureMaxPooling2dLayer(layout)
+        elif self.layer_type == "Convolution 2d":
+            self.configureConvolution2dLayer(layout)
+        elif self.layer_type == "Convolution 2d Transpose":
+            self.configureConvolution2dTransposeLayer(layout)
+        elif self.layer_type == "Depthwise Convolution 2d":
+            self.configureDepthwiseConvolution2dLayer(layout)
+        elif self.layer_type == "Separable Convolution 2d":
+            self.configureSeparableConvolution2dLayer(layout)
+        elif self.layer_type == "Convolution LSTM 2d":
+            self.configureConvolutionLSTM2dLayer(layout)
+        elif self.layer_type == "Simple RNN":
+            self.configureSimpleRNNLayer(layout)
+        elif self.layer_type == "LSTM":
+            self.configureLSTMLayer(layout)
+        elif self.layer_type == "GRU":
+            self.configureGRULayer(layout)
+        # Add conditions for other layer types
+
+        # Dialog buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
+        layout.addWidget(buttons)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+    def configureDenseLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+
+        # Add widgets specific to configuring Dense layer
+        pass
+
+    def configureFlattenLayer(self, layout):
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureZeroPadding2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureAveragePooling2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureMaxPooling2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureConvolution2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureConvolution2dTransposeLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureDepthwisConvolution2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureSeparableConvolution2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10", "Parameter 11"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureConvolutionLSTM2dLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10", "Parameter 11", "Parameter 12", "Parameter 13", "Parameter 14"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureSimpleRNNLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureLSTMLayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10", "Parameter 11"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+    def configureGRULayer(self, layout):
+        for _ in range(4):
+            comboBox = QComboBox()
+            comboBox.addItems(["Parameter 1", "Parameter 2", "Parameter 3", "Parameter 4", "Parameter 5", "Parameter 6", "Parameter 7", "Parameter 8", "Parameter 9", "Parameter 10", "Parameter 11"])
+            layout.addWidget(comboBox)
+
+            #add text box
+            lineEdit = QLineEdit()
+            lineEdit.setPlaceholderText("Text Box")
+            layout.addWidget(lineEdit)
+        # Add widgets specific to configuring layer
+        pass
+
+class AddLayerDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Add Layer")
+
+        layout = QVBoxLayout(self)
+
+        self.comboBox = QComboBox()
+        self.comboBox.addItems(["Dense", "Flatten", "Zero Padding 2d", "Average Pooling 2d", "Max Pooling 2d", "Convolution 2d", "Convolution 2d Transpose", "Depthwise Convolution 2d", "Separable Convolution 2d", "Convolution LSTM 2d", "Simple RNN", "LSTM", "GRU"])
+        layout.addWidget(self.comboBox)
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
+        layout.addWidget(self.buttons)
+
+        self.buttons.accepted.connect(self.openConfigureAddLayerDialog)
+        self.buttons.rejected.connect(self.reject)
+
+        self.comboBox.currentTextChanged.connect(self.updateConfigureDialog)
+
+        self.setMinimumSize(300, 100)
+
+    def openConfigureAddLayerDialog(self):
+        dialog = ConfigureAddLayerDialog(self.comboBox.currentText(), self)
+        dialog.exec_()
+
+    def updateConfigureDialog(self, layer_type):
+        # Update the configuration dialog when the layer type is changed
+        pass
+
+
+class ConfigureInputDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Configure Input")
+
+        layout = QVBoxLayout(self)
+
+        # File selection components
+        file_selection_layout = QHBoxLayout()
+        self.file_path_label = QLabel("No file selected")
+        self.file_path_label.setWordWrap(True)  # Allow label to wrap if path is too long
+        select_file_button = QPushButton("Select File")
+        file_selection_layout.addWidget(select_file_button)
+        file_selection_layout.addWidget(self.file_path_label, 1)  # The '1' makes the label expandable
+
+        select_file_button.clicked.connect(self.selectFile)
+
+        layout.addLayout(file_selection_layout)
+
+        # Input Shape components grouped together
+        input_shape_group = QGroupBox("Input Shape")
+        input_shape_layout = QHBoxLayout(input_shape_group)
+
+        width_input = QLineEdit()
+        height_input = QLineEdit()
+
+        validator = QRegularExpressionValidator(QRegularExpression("[0-9]{0,4}"))
+        width_input.setValidator(validator)
+        height_input.setValidator(validator)
+
+        input_shape_layout.addWidget(width_input)
+        input_shape_layout.addWidget(QLabel("X"))
+        input_shape_layout.addWidget(height_input)
+
+        layout.addWidget(input_shape_group)
+
+        # Dialog buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        layout.addWidget(buttons)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+    def selectFile(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select file")
+        if file_path:  # Only update the label if a file was selected
+            self.file_path_label.setText(file_path)
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Main widget for the QMainWindow.
+        main_widget = QWidget(self)
+        self.setCentralWidget(main_widget)
+
+        # Main layout for the central widget.
+        main_layout = QVBoxLayout(main_widget)
+
+        # Tab widget setup.
+        tab_widget = QTabWidget()
+        for i in range(1, 7):
+            tab = QWidget()
+            layout = QVBoxLayout(tab)
+            label = QLabel(f"Content of Model {i}", tab)
+            layout.addWidget(label)
+            tab_widget.addTab(tab, f"Model {i}")
+
+        # Adding the tab widget to the main layout with stretch factor.
+        main_layout.addWidget(tab_widget, 1)  # Add stretch to make sure it expands
+
+        # Buttons
+        buttons_layout = QHBoxLayout()
+        self.add_layer_button = QPushButton("Add Layer")
+        self.remove_layer_button = QPushButton("Remove Layer")
+        self.use_preset_button = QPushButton("Use Preset")
+        self.configure_input_button = QPushButton("Configure Input")
+        buttons = [self.add_layer_button, self.remove_layer_button, self.use_preset_button, self.configure_input_button]
+        for button in buttons:
+            if isinstance(button, QPushButton):
+                buttons_layout.addWidget(button)
+
+        # Add buttons layout below the tab widget.
+        main_layout.addLayout(buttons_layout)
+
+        # Connect the "Configure Input" button
+        self.configure_input_button.clicked.connect(self.openConfigureInputModal)
+
+        # Connect the "Use Preset" button
+        self.use_preset_button.clicked.connect(self.openUsePresetModal)
+
+        # Connect the "Add Layer" button
+        self.add_layer_button.clicked.connect(self.openAddLayerModal)
+
+        # Adjust the main window's size to ensure content is visible.
+        self.setMinimumSize(800, 600)
+
+    def openConfigureInputModal(self):
+        dialog = ConfigureInputDialog(self)
+        dialog.exec()
+
+
+    def openUsePresetModal(self):
+        dialog = UsePresetDialog(self)
+        dialog.exec()
+
+    def openAddLayerModal(self):
+        dialog = AddLayerDialog(self)
+        dialog.exec()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.setWindowTitle("EEG App")
+    window.show()
+    sys.exit(app.exec())
