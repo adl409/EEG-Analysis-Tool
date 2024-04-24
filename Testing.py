@@ -16,7 +16,7 @@ class ConfigMenu(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Testing Configuration Menu')
+        self.setWindowTitle('Load Models')
         self.setGeometry(400,400,400,400)
 
         self.central_widget = QWidget()
@@ -33,7 +33,7 @@ class ConfigMenu(QMainWindow):
         # Label to display model loading status
         self.status_label = QLabel("")
         self.layout.addWidget(self.status_label)
-
+    #Opens files and allows user to select where and what file to open to load the model
     def loadModel(self):
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("Model files (*.h5 *.hdf5 *.pb *.pbtxt)")
