@@ -12,6 +12,6 @@ def saveModel(self):
                         self.model.save(model_path)
                         self.status_label.setText("Model saved successfully")
                     except Exception as e:
-                        self.status_label.setText(f"Failed to save model: {str(e)}")
+                        self.status_label.setText("Failed to save model. Please try again.")
         else:
             self.status_label.setText("No model to save")
