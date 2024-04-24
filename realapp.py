@@ -4,12 +4,74 @@ from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayo
 from PySide6.QtCore import QRegularExpression
 from PySide6.QtGui import QRegularExpressionValidator
 
+from layerClasses import *
+
+from time import sleep
+
+models = {
+    "input_parameters": {
+        "input_shape1" : 0,
+        "input_shape2" : 0,
+        #EX dir
+        "root_directory" : "",
+        "normalized" : False
+    },
+    "test_parameters": {
+        "test_split" : 0.20,
+        "epochs" : 10,
+        "shuffle" : True
+    },
+    "model_1" : {
+        "save_model" : True, 
+        "save_file" : "mod1",
+        "active": True,
+        "layers": [
+            # Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
+        ]
+    },
+    "model_2" : {
+        "save_model" : False,
+        "save_file" : "mod2", 
+        "active": False,
+        "layers": [
+            # Max_Pool_2d(1)
+        ]
+    },
+    "model_3" : {
+        "save_model" : False,
+        "save_file" : "mod3", 
+        "active": False,
+        "layers": [
+            # Dense(1, 64), Flatten(2)
+        ]
+    },
+    "model_4" : {
+        "save_model" : False,
+        "save_file" : "mod4",
+        "active": False,
+        "layers": [
+            # Dense(1, 64), Flatten(2)
+        ]
+    },
+    "model_5" : {
+        "save_model" : False,
+        "save_file" : "mod5",
+        "active": False,
+        "layers": [
+            # Dense(1, 64)
+        ]
+    }
+}
+
+
+
 class ConfigureAddLayerDialog(QDialog):
     def __init__(self, layer_type, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configure Layer")
 
         self.layer_type = layer_type  # Store the selected layer type
+        self.config = []              # Store the configuration for the Layer
 
         layout = QVBoxLayout(self)
 
@@ -46,7 +108,7 @@ class ConfigureAddLayerDialog(QDialog):
         buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
         layout.addWidget(buttons)
 
-        buttons.accepted.connect(self.accept)
+        buttons.accepted.connect(self.saveLayer)    # Saving configuration function
         buttons.rejected.connect(self.reject)
 
     def configureDenseLayer(self, layout):
@@ -63,12 +125,16 @@ class ConfigureAddLayerDialog(QDialog):
         layout.addWidget(units_label)
         layout.addWidget(dense_units)
 
+        self.config.append(dense_units)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         dense_activation = QComboBox()
         dense_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(dense_activation)
+
+        self.config.append(dense_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -77,6 +143,8 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
@@ -84,14 +152,18 @@ class ConfigureAddLayerDialog(QDialog):
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(kernel_initializer)
 
+        self.config.append(kernel_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(bias_initializer)
+        
+        self.config.append(bias_initializer)
 
-    # Add widgets specific to configuring Dense layer
+        # Add widgets specific to configuring Dense layer
         pass
 
     def configureFlattenLayer(self, layout):
@@ -195,7 +267,6 @@ class ConfigureAddLayerDialog(QDialog):
 
         # Add widgets specific to configuring layer
         pass
-
 
     def configureMaxPooling2dLayer(self, layout):
 
@@ -1202,6 +1273,37 @@ class ConfigureAddLayerDialog(QDialog):
         # Add widgets specific to configuring layer
         pass
 
+    def saveLayer(self):
+
+        if self.layer_type == "Dense":
+            length = len(models["model_1"]["layers"])
+            models["model_1"]["layers"].append(Dense(length, self.config[0].text(), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
+        # elif self.layer_type == "Flatten":
+        #     pass
+        # elif self.layer_type == "Zero Padding 2d":
+        #     pass
+        # elif self.layer_type == "Average Pooling 2d":
+        #     pass
+        # elif self.layer_type == "Max Pooling 2d":
+        #     pass
+        # elif self.layer_type == "Convolution 2d":
+        #     pass
+        # elif self.layer_type == "Convolution 2d Transpose":
+        #     pass
+        # elif self.layer_type == "Depthwise Convolution 2d":
+        #     pass
+        # elif self.layer_type == "Separable Convolution 2d":
+        #     pass
+        # elif self.layer_type == "Convolution LSTM 2d":
+        #     pass
+        # elif self.layer_type == "Simple RNN":
+        #     pass
+        # elif self.layer_type == "LSTM":
+        #     pass
+        # elif self.layer_type == "GRU":
+        #     pass
+
+        self.accept()
 
 class AddLayerDialog(QDialog):
     def __init__(self, parent=None):
@@ -1256,7 +1358,6 @@ class UsePresetDialog(QDialog):
 
         self.setMinimumSize(300, 100)
 
-
 class ConfigureInputDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1300,12 +1401,17 @@ class ConfigureInputDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
+        models["input_parameters"]["input_shape1"] = width_input
+        models["input_parameters"]["input_shape2"] = height_input
+        
+
+
     def selectDirectory(self):
 
         file_path = QFileDialog.getExistingDirectory(self, "Select directory")
         if file_path:  # Only update the label if a file path was selected
             self.file_path_label.setText(file_path)
-
+            models["input_parameters"]["root_directory"] = file_path
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -1391,6 +1497,9 @@ def parseData(rootPath):
                 labelledData[i][0].append(updatedPath)
 
     return labelledData
+
+def getConfigs():
+    return models
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
