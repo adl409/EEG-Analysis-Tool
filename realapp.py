@@ -128,8 +128,6 @@ class TestConfigDialog(QDialog):
         models["test_parameters"]["epochs"] = float(self.epoch_input.text())
         models["test_parameters"]["shuffle"] = self.checkbox.isChecked()
         
-        print(models)
-
         self.accept()
 
 class ConfigureAddLayerDialog(QDialog):
@@ -258,10 +256,14 @@ class ConfigureAddLayerDialog(QDialog):
         zp2d_padding_x.setPlaceholderText("Padding x value")
         layout.addWidget(zp2d_padding_x)
 
+        self.config.append(zp2d_padding_x)
+
         zp2d_padding_y = QLineEdit()
         zp2d_padding_y.setValidator(validator)
         zp2d_padding_y.setPlaceholderText("Padding y value")
         layout.addWidget(zp2d_padding_y)
+
+        self.config.append(zp2d_padding_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         zp2d_padding = []
@@ -292,10 +294,14 @@ class ConfigureAddLayerDialog(QDialog):
         ap2d_poolsize_x.setPlaceholderText("Pool Size x value")
         layout.addWidget(ap2d_poolsize_x)
 
+        self.config.append(ap2d_poolsize_x)
+
         ap2d_poolsize_y = QLineEdit()
         ap2d_poolsize_y.setValidator(validator)
         ap2d_poolsize_y.setPlaceholderText("Pool Size y value")
         layout.addWidget(ap2d_poolsize_y)
+
+        self.config.append(ap2d_poolsize_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         ap2d_poolsize = []
@@ -314,10 +320,14 @@ class ConfigureAddLayerDialog(QDialog):
         ap2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(ap2d_strides_x)
 
+        self.config.append(ap2d_strides_x)
+
         ap2d_strides_y = QLineEdit()
         ap2d_strides_y.setValidator(validator)
         ap2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(ap2d_strides_y)
+
+        self.config.append(ap2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         ap2d_strides = []
@@ -330,6 +340,8 @@ class ConfigureAddLayerDialog(QDialog):
         ap2d_padding = QComboBox()
         ap2d_padding.addItems(["valid", "same"])
         layout.addWidget(ap2d_padding)
+
+        self.config.append(ap2d_padding)
 
 
         # Add widgets specific to configuring layer
@@ -352,10 +364,14 @@ class ConfigureAddLayerDialog(QDialog):
         mp2d_poolsize_x.setPlaceholderText("Pool Size x value")
         layout.addWidget(mp2d_poolsize_x)
 
+        self.config.append(mp2d_poolsize_x)
+
         mp2d_poolsize_y = QLineEdit()
         mp2d_poolsize_y.setValidator(validator)
         mp2d_poolsize_y.setPlaceholderText("Pool Size y value")
         layout.addWidget(mp2d_poolsize_y)
+
+        self.config.append(mp2d_poolsize_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         mp2d_poolsize = []
@@ -374,10 +390,14 @@ class ConfigureAddLayerDialog(QDialog):
         mp2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(mp2d_strides_x)
 
+        self.config.append(mp2d_strides_x)
+
         mp2d_strides_y = QLineEdit()
         mp2d_strides_y.setValidator(validator)
         mp2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(mp2d_strides_y)
+
+        self.config.append(mp2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         mp2d_strides = []
@@ -390,6 +410,8 @@ class ConfigureAddLayerDialog(QDialog):
         mp2d_padding = QComboBox()
         mp2d_padding.addItems(["valid", "same"])
         layout.addWidget(mp2d_padding)
+
+        self.config.append(mp2d_padding)
 
         # Add widgets specific to configuring layer
         pass
@@ -409,6 +431,8 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_filter.setValidator(validator)
         layout.addWidget(c2d_filter)
 
+        self.config.append(c2d_filter)
+
         #kernel size
         kernelsize_label = QLabel("Kernel Size: (x, y)")
         layout.addWidget(kernelsize_label)
@@ -422,10 +446,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_kernelsize_x.setPlaceholderText("Kernel Size x value")
         layout.addWidget(c2d_kernelsize_x)
 
+        self.config.append(c2d_kernelsize_x)
+
         c2d_kernelsize_y = QLineEdit()
         c2d_kernelsize_y.setValidator(validator)
         c2d_kernelsize_y.setPlaceholderText("Kernel Size y value")
         layout.addWidget(c2d_kernelsize_y)
+
+        self.config.append(c2d_kernelsize_y)
 
         #strides
         strides_label = QLabel("Strides: (x, y)")
@@ -440,10 +468,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(c2d_strides_x)
 
+        self.config.append(c2d_strides_x)
+
         c2d_strides_y = QLineEdit()
         c2d_strides_y.setValidator(validator)
         c2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(c2d_strides_y)
+
+        self.config.append(c2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         c2d_strides = []
@@ -457,6 +489,8 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_padding.addItems(["valid", "same"])
         layout.addWidget(c2d_padding)
 
+        self.config.append(c2d_padding)
+
         #dialation rate
         dialationrate_label = QLabel("Dialation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
@@ -469,10 +503,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
         layout.addWidget(c2d_dialationrate_x)
 
+        self.config.append(c2d_dialationrate_x)
+
         c2d_dialationrate_y = QLineEdit()
         c2d_dialationrate_y.setValidator(validator)
         c2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
         layout.addWidget(c2d_dialationrate_y)
+
+        self.config.append(c2d_dialationrate_y)
 
         #groups
         groups_label = QLabel("Groups:")
@@ -485,12 +523,16 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_groups.setValidator(validator)
         layout.addWidget(c2d_groups)
 
+        self.config.append(c2d_groups)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         c2d_activation = QComboBox()
         c2d_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(c2d_activation)
+
+        self.config.append(c2d_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -499,6 +541,8 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
@@ -506,12 +550,16 @@ class ConfigureAddLayerDialog(QDialog):
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
+        self.config.append(kernel_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
 
         # Add widgets specific to configuring layer
         pass
@@ -531,6 +579,8 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_filter.setValidator(validator)
         layout.addWidget(c2dt_filter)
 
+        self.config.append(c2dt_filter)
+
         #kernel size
         kernelsize_label = QLabel("Kernel Size: (x, y)")
         layout.addWidget(kernelsize_label)
@@ -544,10 +594,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_kernelsize_x.setPlaceholderText("Kernel Size x value")
         layout.addWidget(c2dt_kernelsize_x)
 
+        self.config.append(c2dt_kernelsize_x)
+
         c2dt_kernelsize_y = QLineEdit()
         c2dt_kernelsize_y.setValidator(validator)
         c2dt_kernelsize_y.setPlaceholderText("Kernel Size y value")
         layout.addWidget(c2dt_kernelsize_y)
+
+        self.config.append(c2dt_kernelsize_y)
 
         #strides
         strides_label = QLabel("Strides: (x, y)")
@@ -562,10 +616,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(c2dt_strides_x)
 
+        self.config.append(c2dt_strides_x)
+
         c2dt_strides_y = QLineEdit()
         c2dt_strides_y.setValidator(validator)
         c2dt_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(c2dt_strides_y)
+
+        self.config.append(c2dt_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         c2dt_strides = []
@@ -579,6 +637,8 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_padding.addItems(["valid", "same"])
         layout.addWidget(c2dt_padding)
 
+        self.config.append(c2dt_padding)
+
         #dialation rate
         dialationrate_label = QLabel("Dialation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
@@ -591,10 +651,14 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_dialationrate_x.setPlaceholderText("Dialation Rate x value")
         layout.addWidget(c2dt_dialationrate_x)
 
+        self.config.append(c2dt_dialationrate_x)
+
         c2dt_dialationrate_y = QLineEdit()
         c2dt_dialationrate_y.setValidator(validator)
         c2dt_dialationrate_y.setPlaceholderText("Dialation Rate y value")
         layout.addWidget(c2dt_dialationrate_y)
+
+        self.config.append(c2dt_dialationrate_y)
 
         #groups
         groups_label = QLabel("Groups:")
@@ -607,12 +671,16 @@ class ConfigureAddLayerDialog(QDialog):
         c2dt_groups.setValidator(validator)
         layout.addWidget(c2dt_groups)
 
+        self.config.append(c2dt_groups)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         c2dt_activation = QComboBox()
         c2dt_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(c2dt_activation)
+
+        self.config.append(c2dt_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -621,6 +689,8 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
@@ -628,12 +698,16 @@ class ConfigureAddLayerDialog(QDialog):
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
+        self.config.append(kernel_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
 
 
 
@@ -655,6 +729,8 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_filter.setValidator(validator)
         layout.addWidget(dc2d_filter)
 
+        self.config.append(dc2d_filter)
+
         #kernel size
         kernelsize_label = QLabel("Kernel Size: (x, y)")
         layout.addWidget(kernelsize_label)
@@ -668,10 +744,14 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_kernelsize_x.setPlaceholderText("Kernel Size x value")
         layout.addWidget(dc2d_kernelsize_x)
 
+        self.config.append(dc2d_kernelsize_x)
+
         dc2d_kernelsize_y = QLineEdit()
         dc2d_kernelsize_y.setValidator(validator)
         dc2d_kernelsize_y.setPlaceholderText("Kernel Size y value")
         layout.addWidget(dc2d_kernelsize_y)
+
+        self.config.append(dc2d_kernelsize_y)
 
         #strides
         strides_label = QLabel("Strides: (x, y)")
@@ -686,10 +766,14 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(dc2d_strides_x)
 
+        self.config.append(dc2d_strides_x)
+
         dc2d_strides_y = QLineEdit()
         dc2d_strides_y.setValidator(validator)
         dc2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(dc2d_strides_y)
+
+        self.config.append(dc2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         dc2d_strides = []
@@ -703,6 +787,8 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_padding.addItems(["valid", "same"])
         layout.addWidget(dc2d_padding)
 
+        self.config.append(dc2d_padding)
+
         #dialation rate
         dialationrate_label = QLabel("Dialation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
@@ -715,10 +801,14 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
         layout.addWidget(dc2d_dialationrate_x)
 
+        self.config.append(dc2d_dialationrate_x)
+
         dc2d_dialationrate_y = QLineEdit()
         dc2d_dialationrate_y.setValidator(validator)
         dc2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
         layout.addWidget(dc2d_dialationrate_y)
+
+        self.config.append(dc2d_dialationrate_y)
 
         #depth multiplier
         depthmultiplier_label = QLabel("Depth Multiplier:")
@@ -731,12 +821,16 @@ class ConfigureAddLayerDialog(QDialog):
         dc2d_depthmultiplier.setValidator(validator)
         layout.addWidget(dc2d_depthmultiplier)
 
+        self.config.append(dc2d_depthmultiplier)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         dc2d_activation = QComboBox()
         dc2d_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(dc2d_activation)
+
+        self.config.append(dc2d_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -745,6 +839,8 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #depthwise initializer
         d_initializer_label = QLabel("Depthwise Initializer:")
         layout.addWidget(d_initializer_label)
@@ -752,12 +848,16 @@ class ConfigureAddLayerDialog(QDialog):
         depthwise_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(depthwise_initializer)
 
+        self.config.append(depthwise_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
 
         # Add widgets specific to configuring layer
         pass
@@ -777,6 +877,8 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_filter.setValidator(validator)
         layout.addWidget(sc2d_filter)
 
+        self.config.append(sc2d_filter)
+
         #kernel size
         kernelsize_label = QLabel("Kernel Size: (x, y)")
         layout.addWidget(kernelsize_label)
@@ -790,10 +892,14 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_kernelsize_x.setPlaceholderText("Kernel Size x value")
         layout.addWidget(sc2d_kernelsize_x)
 
+        self.config.append(sc2d_kernelsize_x)
+
         sc2d_kernelsize_y = QLineEdit()
         sc2d_kernelsize_y.setValidator(validator)
         sc2d_kernelsize_y.setPlaceholderText("Kernel Size y value")
         layout.addWidget(sc2d_kernelsize_y)
+
+        self.config.append(sc2d_kernelsize_y)
 
         #strides
         strides_label = QLabel("Strides: (x, y)")
@@ -808,10 +914,14 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(sc2d_strides_x)
 
+        self.config.append(sc2d_strides_x)
+
         sc2d_strides_y = QLineEdit()
         sc2d_strides_y.setValidator(validator)
         sc2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(sc2d_strides_y)
+
+        self.config.append(sc2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         sc2d_strides = []
@@ -825,6 +935,8 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_padding.addItems(["valid", "same"])
         layout.addWidget(sc2d_padding)
 
+        self.config.append(sc2d_padding)
+
         #dialation rate
         dialationrate_label = QLabel("Dialation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
@@ -837,10 +949,14 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
         layout.addWidget(sc2d_dialationrate_x)
 
+        self.config.append(sc2d_dialationrate_x)
+
         sc2d_dialationrate_y = QLineEdit()
         sc2d_dialationrate_y.setValidator(validator)
         sc2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
         layout.addWidget(sc2d_dialationrate_y)
+
+        self.config.append(sc2d_dialationrate_y)
 
         #depth multiplier
         depthmultiplier_label = QLabel("Depth Multiplier:")
@@ -853,12 +969,16 @@ class ConfigureAddLayerDialog(QDialog):
         sc2d_depthmultiplier.setValidator(validator)
         layout.addWidget(sc2d_depthmultiplier)
 
+        self.config.append(sc2d_depthmultiplier)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         sc2d_activation = QComboBox()
         sc2d_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(sc2d_activation)
+
+        self.config.append(sc2d_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -867,12 +987,16 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #depthwise initializer
         d_initializer_label = QLabel("Depthwise Initializer:")
         layout.addWidget(d_initializer_label)
         depthwise_initializer = QComboBox()
         depthwise_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(depthwise_initializer)
+
+        self.config.append(depthwise_initializer)
 
         #pointwise initializer
         p_initializer_label = QLabel("Pointwise Initializer:")
@@ -881,6 +1005,8 @@ class ConfigureAddLayerDialog(QDialog):
         pointwise_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(pointwise_initializer)
 
+        self.config.append(pointwise_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
@@ -888,6 +1014,7 @@ class ConfigureAddLayerDialog(QDialog):
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
 
+        self.config.append(bias_initializer)
 
         # Add widgets specific to configuring layer
         pass
@@ -909,6 +1036,8 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_filter.setValidator(validator)
         layout.addWidget(clstm2d_filter)
 
+        self.config.append(clstm2d_filter)
+
         #kernel size
         kernelsize_label = QLabel("Kernel Size: (x, y)")
         layout.addWidget(kernelsize_label)
@@ -922,10 +1051,14 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_kernelsize_x.setPlaceholderText("Kernel Size x value")
         layout.addWidget(clstm2d_kernelsize_x)
 
+        self.config.append(clstm2d_kernelsize_x)
+
         clstm2d_kernelsize_y = QLineEdit()
         clstm2d_kernelsize_y.setValidator(validator)
         clstm2d_kernelsize_y.setPlaceholderText("Kernel Size y value")
         layout.addWidget(clstm2d_kernelsize_y)
+
+        self.config.append(clstm2d_kernelsize_y)
 
         #strides
         strides_label = QLabel("Strides: (x, y)")
@@ -940,10 +1073,14 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_strides_x.setPlaceholderText("Strides x value")
         layout.addWidget(clstm2d_strides_x)
 
+        self.config.append(clstm2d_strides_x)
+
         clstm2d_strides_y = QLineEdit()
         clstm2d_strides_y.setValidator(validator)
         clstm2d_strides_y.setPlaceholderText("Strides y value")
         layout.addWidget(clstm2d_strides_y)
+
+        self.config.append(clstm2d_strides_y)
 
         #PROBABLY DOESN'T WORK RIGHT
         clstm2d_strides = []
@@ -957,6 +1094,8 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_padding.addItems(["valid", "same"])
         layout.addWidget(clstm2d_padding)
 
+        self.config.append(clstm2d_padding)
+
         #dialation rate
         dialationrate_label = QLabel("Dialation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
@@ -969,10 +1108,14 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
         layout.addWidget(clstm2d_dialationrate_x)
 
+        self.config.append(clstm2d_dialationrate_x)
+
         clstm2d_dialationrate_y = QLineEdit()
         clstm2d_dialationrate_y.setValidator(validator)
         clstm2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
         layout.addWidget(clstm2d_dialationrate_y)
+
+        self.config.append(clstm2d_dialationrate_y)
 
         #activation dropdown
         activation_label = QLabel("Activation Type:")
@@ -981,12 +1124,16 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(clstm2d_activation)
 
+        self.config.append(clstm2d_activation)
+
         #recurrent activation dropdown
         recurrent_activation_label = QLabel("Recurrent Activation Type:")
         layout.addWidget(recurrent_activation_label)
         clstm2d_recurrent_activation = QComboBox()
         clstm2d_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(clstm2d_recurrent_activation)
+
+        self.config.append(clstm2d_recurrent_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -995,12 +1142,16 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
+
+        self.config.append(kernel_initializer)
 
         #recurrent initializer
         r_initializer_label = QLabel("Recurrent Initializer:")
@@ -1009,12 +1160,16 @@ class ConfigureAddLayerDialog(QDialog):
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(recurrent_initializer)
 
+        self.config.append(recurrent_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
 
         #dropout
         dropout_label = QLabel("Dropout:")
@@ -1027,6 +1182,8 @@ class ConfigureAddLayerDialog(QDialog):
         # clstm2d_dropout.setValidator(float_validator)
         layout.addWidget(clstm2d_dropout)
 
+        self.config.append(clstm2d_dropout)
+
         #recurrent dropout
         recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
@@ -1038,6 +1195,8 @@ class ConfigureAddLayerDialog(QDialog):
         # clstm2d_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(clstm2d_recurrent_dropout)
 
+        self.config.append(clstm2d_recurrent_dropout)
+
         #seed
         seed_label = QLabel("Seed:")
         layout.addWidget(seed_label)
@@ -1047,6 +1206,8 @@ class ConfigureAddLayerDialog(QDialog):
         clstm2d_seed.setPlaceholderText("Seed")
         clstm2d_seed.setValidator(validator)
         layout.addWidget(clstm2d_seed)
+
+        self.config.append(clstm2d_seed)
 
         # Add widgets specific to configuring layer
         pass
@@ -1068,12 +1229,16 @@ class ConfigureAddLayerDialog(QDialog):
         srnn_units.setValidator(validator)
         layout.addWidget(srnn_units)
 
+        self.config.append(srnn_units)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         srnn_activation = QComboBox()
         srnn_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(srnn_activation)
+
+        self.config.append(srnn_activation)
 
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
@@ -1082,12 +1247,16 @@ class ConfigureAddLayerDialog(QDialog):
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
 
+        self.config.append(use_bias)
+
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
+
+        self.config.append(kernel_initializer)
 
         #recurrent initializer
         r_initializer_label = QLabel("Recurrent Initializer:")
@@ -1096,12 +1265,16 @@ class ConfigureAddLayerDialog(QDialog):
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(recurrent_initializer)
 
+        self.config.append(recurrent_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
 
         #dropout
         dropout_label = QLabel("Dropout:")
@@ -1114,6 +1287,8 @@ class ConfigureAddLayerDialog(QDialog):
         # srnn_dropout.setValidator(float_validator)
         layout.addWidget(srnn_dropout)
 
+        self.config.append(srnn_dropout)
+
         #recurrent dropout
         recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
@@ -1125,6 +1300,8 @@ class ConfigureAddLayerDialog(QDialog):
         # srnn_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(srnn_recurrent_dropout)
 
+        self.config.append(srnn_recurrent_dropout)
+
         #seed
         seed_label = QLabel("Seed:")
         layout.addWidget(seed_label)
@@ -1134,6 +1311,8 @@ class ConfigureAddLayerDialog(QDialog):
         srnn_seed.setPlaceholderText("Seed")
         srnn_seed.setValidator(validator)
         layout.addWidget(srnn_seed)
+
+        self.config.append(srnn_seed)
 
         # Add widgets specific to configuring layer
         pass
@@ -1155,12 +1334,16 @@ class ConfigureAddLayerDialog(QDialog):
         lstm_units.setValidator(validator)
         layout.addWidget(lstm_units)
 
+        self.config.append(lstm_units)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         lstm_activation = QComboBox()
         lstm_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(lstm_activation)
+
+        self.config.append(lstm_activation)
 
         #recurrent activation dropdown
         recurrent_activation_label = QLabel("Recurrent Activation Type:")
@@ -1169,12 +1352,16 @@ class ConfigureAddLayerDialog(QDialog):
         lstm_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(lstm_recurrent_activation)
 
+        self.config.append(lstm_recurrent_activation)
+
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
+
+        self.config.append(use_bias)
 
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
@@ -1183,12 +1370,16 @@ class ConfigureAddLayerDialog(QDialog):
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
+        self.config.append(kernel_initializer)
+
         #recurrent initializer
         r_initializer_label = QLabel("Recurrent Initializer:")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(recurrent_initializer)
+
+        self.config.append(recurrent_initializer)
 
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
@@ -1197,12 +1388,17 @@ class ConfigureAddLayerDialog(QDialog):
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
 
+        self.config.append(bias_initializer)
+
         #unit forget bias dropdown
         unit_forget_bias_label = QLabel("Use Bias:")
         layout.addWidget(unit_forget_bias_label)
         unit_forget_bias = QComboBox()
         unit_forget_bias.addItems(["True", "False"])
         layout.addWidget(unit_forget_bias)
+
+        self.config.append(unit_forget_bias)
+
 
         #dropout
         dropout_label = QLabel("Dropout:")
@@ -1215,6 +1411,8 @@ class ConfigureAddLayerDialog(QDialog):
         # lstm_dropout.setValidator(float_validator)
         layout.addWidget(lstm_dropout)
 
+        self.config.append(lstm_dropout)
+
         #recurrent dropout
         recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
@@ -1226,6 +1424,8 @@ class ConfigureAddLayerDialog(QDialog):
         # lstm_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(lstm_recurrent_dropout)
 
+        self.config.append(lstm_recurrent_dropout)
+
         #seed
         seed_label = QLabel("Seed:")
         layout.addWidget(seed_label)
@@ -1235,6 +1435,8 @@ class ConfigureAddLayerDialog(QDialog):
         lstm_seed.setPlaceholderText("Seed")
         lstm_seed.setValidator(validator)
         layout.addWidget(lstm_seed)
+
+        self.config.append(lstm_seed)
 
         # Add widgets specific to configuring layer
         pass
@@ -1256,12 +1458,16 @@ class ConfigureAddLayerDialog(QDialog):
         gru_units.setValidator(validator)
         layout.addWidget(gru_units)
 
+        self.config.append(gru_units)
+
         #activation dropdown
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         gru_activation = QComboBox()
         gru_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(gru_activation)
+
+        self.config.append(gru_activation)
 
         #recurrent activation dropdown
         recurrent_activation_label = QLabel("Recurrent Activation Type:")
@@ -1270,12 +1476,16 @@ class ConfigureAddLayerDialog(QDialog):
         gru_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(gru_recurrent_activation)
 
+        self.config.append(gru_recurrent_activation)
+
         #use bias dropdown
         bias_label = QLabel("Use Bias:")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
         layout.addWidget(use_bias)
+
+        self.config.append(use_bias)
 
         #kernel initializer
         k_initializer_label = QLabel("Kernel Initializer:")
@@ -1284,6 +1494,8 @@ class ConfigureAddLayerDialog(QDialog):
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
+        self.config.append(kernel_initializer)
+
         #recurrent initializer
         r_initializer_label = QLabel("Recurrent Initializer:")
         layout.addWidget(r_initializer_label)
@@ -1291,12 +1503,21 @@ class ConfigureAddLayerDialog(QDialog):
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(recurrent_initializer)
 
+        self.config.append(recurrent_initializer)
+
         #bias initializer
         b_initializer_label = QLabel("Bias Initializer:")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         layout.addWidget(bias_initializer)
+
+        self.config.append(bias_initializer)
+
+        gru_unit_forget_bias = QCheckBox("Unit Forget Bias")
+        layout.addWidget(gru_unit_forget_bias)
+
+        self.config.append(gru_unit_forget_bias)
 
         #dropout
         dropout_label = QLabel("Dropout:")
@@ -1309,6 +1530,8 @@ class ConfigureAddLayerDialog(QDialog):
         # gru_dropout.setValidator(float_validator)
         layout.addWidget(gru_dropout)
 
+        self.config.append(gru_dropout)
+
         #recurrent dropout
         recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
@@ -1320,6 +1543,8 @@ class ConfigureAddLayerDialog(QDialog):
         # lstm_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(gru_recurrent_dropout)
 
+        self.config.append(gru_recurrent_dropout)
+
         #seed
         seed_label = QLabel("Seed:")
         layout.addWidget(seed_label)
@@ -1330,6 +1555,8 @@ class ConfigureAddLayerDialog(QDialog):
         gru_seed.setValidator(validator)
         layout.addWidget(gru_seed)
 
+        self.config.append(gru_seed)
+
         #reset after dropdown
         reset_after_label = QLabel("Reset After:")
         layout.addWidget(reset_after_label)
@@ -1337,38 +1564,40 @@ class ConfigureAddLayerDialog(QDialog):
         reset_after.addItems(["True", "False"])
         layout.addWidget(reset_after)
 
+        self.config.append(reset_after)
+
         # Add widgets specific to configuring layer
         pass
 
     def saveLayer(self):
 
+        length = len(models["model_1"]["layers"])
         if self.layer_type == "Dense":
-            length = len(models["model_1"]["layers"])
-            models["model_1"]["layers"].append(Dense(length, float(self.config[0].text()), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
-        # elif self.layer_type == "Flatten":
-        #     pass
-        # elif self.layer_type == "Zero Padding 2d":
-        #     pass
-        # elif self.layer_type == "Average Pooling 2d":
-        #     pass
-        # elif self.layer_type == "Max Pooling 2d":
-        #     pass
-        # elif self.layer_type == "Convolution 2d":
-        #     pass
-        # elif self.layer_type == "Convolution 2d Transpose":
-        #     pass
-        # elif self.layer_type == "Depthwise Convolution 2d":
-        #     pass
-        # elif self.layer_type == "Separable Convolution 2d":
-        #     pass
-        # elif self.layer_type == "Convolution LSTM 2d":
-        #     pass
-        # elif self.layer_type == "Simple RNN":
-        #     pass
-        # elif self.layer_type == "LSTM":
-        #     pass
-        # elif self.layer_type == "GRU":
-        #     pass
+            models["model_1"]["layers"].append(Dense(length, int(float(self.config[0].text())), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
+        elif self.layer_type == "Flatten":
+            models["model_1"]["layers"].append(Flatten(length))
+        elif self.layer_type == "Zero Padding 2d":
+            models["model_1"]["layers"].append(Zero_Padding_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text())))))
+        elif self.layer_type == "Average Pooling 2d":
+            models["model_1"]["layers"].append(Average_Pooling_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text()))), (int(float(self.config[2].text())), int(float(self.config[3].text()))), self.config[4].currentText()))
+        elif self.layer_type == "Max Pooling 2d":
+            models["model_1"]["layers"].append(Max_Pool_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text()))), (int(float(self.config[2].text())), int(float(self.config[3].text()))), self.config[4].currentText()))
+        elif self.layer_type == "Convolution 2d":
+            models["model_1"]["layers"].append(Convolution_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+        elif self.layer_type == "Convolution 2d Transpose":
+            models["model_1"]["layers"].append(Convolution_2d_Transpose(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+        elif self.layer_type == "Depthwise Convolution 2d":
+            models["model_1"]["layers"].append(Depthwise_Conv_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+        elif self.layer_type == "Separable Convolution 2d":
+            models["model_1"]["layers"].append(Separable_Conv_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText(), self.config[13].currentText()))
+        elif self.layer_type == "Convolution LSTM 2d":
+            models["model_1"]["layers"].append(Conv_LSTM_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))),  self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), self.config[8].currentText(), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText(), self.config[13].currentText(), float(self.config[14].text()), float(self.config[15].text()), int(float(self.config[16].text()))))
+        elif self.layer_type == "Simple RNN":
+            models["model_1"]["layers"].append(SimpleRNN(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), float(self.config[6].text()), float(self.config[7].text()), int(float(self.config[8].text()))))
+        elif self.layer_type == "LSTM":
+            models["model_1"]["layers"].append(LSTM(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), self.config[6].currentText(), self.config[7].currentText(), float(self.config[8].text()), float(self.config[9].text()), int(float(self.config[10].text()))))
+        elif self.layer_type == "GRU":
+            models["model_1"]["layers"].append(GRU(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), self.config[6].currentText(), self.config[7].isChecked(), float(self.config[8].text()), float(self.config[9].text()), int(float(self.config[10].text())), self.config[11].currentText()))
 
         self.accept()
 

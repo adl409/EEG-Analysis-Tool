@@ -45,7 +45,7 @@ class Convolution_2d:
     def __init__(self,index,filters=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
                  groups=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform',bias_initializer='zeros'):
         self.index=index
-        self.filter=filter
+        self.filter=filters
         self.kernel_size=kernel_size
         self.strides=strides
         self.padding=padding
@@ -62,7 +62,7 @@ class Convolution_2d_Transpose:
     def __init__(self,index,filters=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
                  groups=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform',bias_initializer='zeros'):
         self.index=index
-        self.filter=filter
+        self.filter=filters
         self.kernel_size=kernel_size
         self.strides=strides
         self.padding=padding
@@ -76,9 +76,10 @@ class Convolution_2d_Transpose:
 
 class Depthwise_Conv_2d:
      
-     def __init__(self,index,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
+     def __init__(self,index,filters=None, kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
                   depth_multiplier=1, activation=None, use_bias=True, depthwise_initializer='glorot_uniform',bias_initializer='zeros'):
         self.index=index
+        self.filter=filters
         self.kernel_size=kernel_size
         self.strides=strides
         self.padding=padding
@@ -96,7 +97,7 @@ class Separable_Conv_2d:
                   dialation_rate=(1,1),depth_multiplier=1, activation=None, use_bias=True, 
                   depthwise_initializer='glorot_uniform',pointwise_initializer='glorot_uniform',bias_initializer='zeros'):
         self.index=index
-        self.filter=filter
+        self.filter=filters
         self.kernel_size=kernel_size
         self.strides=strides
         self.padding=padding
@@ -111,8 +112,8 @@ class Separable_Conv_2d:
 
 class Conv_LSTM_2d:
     
-   def __init__(self, index, filters, kernel_size=(3, 3), strides=(1, 1), padding='valid', 
-                 data_format=None, dilation_rate=(1, 1), activation='tanh', recurrent_activation='sigmoid',
+   def __init__(self, index, filters, kernel_size=(3, 3), strides=(1, 1), padding='valid',
+                 dilation_rate=(1, 1), activation='tanh', recurrent_activation='sigmoid',
                  use_bias=True, kernel_initializer='glorot_uniform', recurrent_initializer='orthogonal',
                  bias_initializer='zeros', dropout=0.0, recurrent_dropout=0.0, seed=None):
         self.index = index
@@ -120,7 +121,6 @@ class Conv_LSTM_2d:
         self.kernel_size = kernel_size
         self.strides = strides
         self.padding = padding
-        self.data_format = data_format
         self.dilation_rate = dilation_rate
         self.activation = activation
         self.recurrent_activation = recurrent_activation
