@@ -1,12 +1,10 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox, QCheckBox
-from PySide6.QtCore import QRegularExpression
+from PySide6.QtWidgets import QApplication, QSlider, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox, QCheckBox
+from PySide6.QtCore import QRegularExpression, Qt
 from PySide6.QtGui import QRegularExpressionValidator
 
 from layerClasses import *
-
-from time import sleep
 
 models = {
     "input_parameters": {
@@ -63,7 +61,76 @@ models = {
     }
 }
 
+class TestConfigDialog(QDialog):
 
+    def onValueChanged(self, value):
+        # Update the label text to display the percentage
+        self.label.setText(f'Data Testing Split: {value}%')
+        #keeps selection to only ticks
+        aligned_value = round(value / 5) * 5
+        self.slider.setValue(aligned_value)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Configure Testing")
+
+        layout = QVBoxLayout(self)
+
+        #Epoch testing
+        self.epoch_group = QGroupBox("Epochs")
+        self.epoch_group.setMaximumWidth(70)
+        self.epoch_group.setMinimumWidth(50)
+        self.epoch_layout = QHBoxLayout(self.epoch_group)
+        self.epoch_input = QLineEdit()
+        self.epoch_input.setMaximumWidth(50)
+        self.epoch_input.setMinimumWidth(50)
+
+        validator = QRegularExpressionValidator(QRegularExpression("[0-9]{0,4}"))
+        self.epoch_input.setValidator(validator)
+
+
+
+        self.epoch_layout.addWidget(self.epoch_input)
+        layout.addWidget(self.epoch_group)
+
+        #Shuffling
+        self.checkbox = QCheckBox("Shuffle")
+        layout.addWidget(self.checkbox)
+
+        #slider for testing split
+        self.label = QLabel('Data Testing Split: 20%')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(20)
+        self.slider.setMaximum(80)
+        self.slider.setValue(20)
+        self.slider.valueChanged.connect(self.onValueChanged)
+        self.slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.slider.setTickInterval(5)
+
+
+        layout.addWidget(self.slider)
+
+        #Dialog buttons
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
+        layout.addWidget(self.buttons)
+
+        #Connect buttons
+        self.buttons.accepted.connect(self.saveConfig)
+        self.buttons.rejected.connect(self.reject)
+
+        self.setMinimumSize(300, 100)
+
+    def saveConfig(self):
+
+        models["test_parameters"]["test_split"] = self.slider.value() / 100
+        models["test_parameters"]["epochs"] = float(self.epoch_input.text())
+        models["test_parameters"]["shuffle"] = self.checkbox.isChecked()
+        
+        print(models)
+
+        self.accept()
 
 class ConfigureAddLayerDialog(QDialog):
     def __init__(self, layer_type, parent=None):
@@ -1277,7 +1344,7 @@ class ConfigureAddLayerDialog(QDialog):
 
         if self.layer_type == "Dense":
             length = len(models["model_1"]["layers"])
-            models["model_1"]["layers"].append(Dense(length, self.config[0].text(), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
+            models["model_1"]["layers"].append(Dense(length, float(self.config[0].text()), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
         # elif self.layer_type == "Flatten":
         #     pass
         # elif self.layer_type == "Zero Padding 2d":
@@ -1424,7 +1491,7 @@ class ConfigureInputDialog(QDialog):
         models["input_parameters"]["normalized"] = self.config[2].isChecked()
 
         self.accept()
-        
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -1454,7 +1521,8 @@ class MainWindow(QMainWindow):
         self.remove_layer_button = QPushButton("Remove Layer")
         self.use_preset_button = QPushButton("Use Preset")
         self.configure_input_button = QPushButton("Configure Input")
-        buttons = [self.add_layer_button, self.remove_layer_button, self.use_preset_button, self.configure_input_button]
+        self.test_input_button = QPushButton("Configure Testing")
+        buttons = [self.add_layer_button, self.remove_layer_button, self.use_preset_button, self.configure_input_button, self.test_input_button]
         for button in buttons:
             if isinstance(button, QPushButton):
                 buttons_layout.addWidget(button)
@@ -1471,6 +1539,8 @@ class MainWindow(QMainWindow):
         # Connect the "Add Layer" button
         self.add_layer_button.clicked.connect(self.openAddLayerModal)
 
+        self.test_input_button.clicked.connect(self.openTestConfigModal)
+
         # Adjust the main window's size to ensure content is visible.
         self.setMinimumSize(800, 600)
 
@@ -1485,6 +1555,10 @@ class MainWindow(QMainWindow):
 
     def openAddLayerModal(self):
         dialog = AddLayerDialog(self)
+        dialog.exec()
+    
+    def openTestConfigModal(self):
+        dialog = TestConfigDialog(self)
         dialog.exec()
 
 def parseData(rootPath):
