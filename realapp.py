@@ -1,6 +1,6 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox
+from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox, QCheckBox
 from PySide6.QtCore import QRegularExpression
 from PySide6.QtGui import QRegularExpressionValidator
 
@@ -1363,6 +1363,8 @@ class ConfigureInputDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Configure Input")
 
+        self.config = []
+
         layout = QVBoxLayout(self)
 
         # File selection components
@@ -1388,24 +1390,27 @@ class ConfigureInputDialog(QDialog):
         width_input.setValidator(validator)
         height_input.setValidator(validator)
 
+        self.config.append(width_input)
+        self.config.append(height_input)
+
         input_shape_layout.addWidget(width_input)
         input_shape_layout.addWidget(QLabel("X"))
         input_shape_layout.addWidget(height_input)
 
         layout.addWidget(input_shape_group)
 
+        normalize = QCheckBox("Normalize")
+        layout.addWidget(normalize)
+
+        self.config.append(normalize)
+
             # Dialog buttons
         buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         layout.addWidget(buttons)
 
-        buttons.accepted.connect(self.accept)
+        buttons.accepted.connect(self.saveConfig)
         buttons.rejected.connect(self.reject)
-
-        models["input_parameters"]["input_shape1"] = width_input
-        models["input_parameters"]["input_shape2"] = height_input
         
-
-
     def selectDirectory(self):
 
         file_path = QFileDialog.getExistingDirectory(self, "Select directory")
@@ -1413,6 +1418,13 @@ class ConfigureInputDialog(QDialog):
             self.file_path_label.setText(file_path)
             models["input_parameters"]["root_directory"] = file_path
 
+    def saveConfig(self):
+        models["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else models["input_parameters"]["input_shape1"]
+        models["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else models["input_parameters"]["input_shape2"]
+        models["input_parameters"]["normalized"] = self.config[2].isChecked()
+
+        self.accept()
+        
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
