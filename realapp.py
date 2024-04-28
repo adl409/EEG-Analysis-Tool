@@ -6,6 +6,7 @@ from PySide6.QtGui import QRegularExpressionValidator
 
 from layerClasses import *
 
+# Dictionary that hold configuration values and will eventually be passed to the backend
 models = {
     "input_parameters": {
         "input_shape1" : 0,
@@ -1570,34 +1571,185 @@ class ConfigureAddLayerDialog(QDialog):
         pass
 
     def saveLayer(self):
-
+        # Append to main dictionary the layer type the user wants to add
         length = len(models["model_1"]["layers"])
         if self.layer_type == "Dense":
-            models["model_1"]["layers"].append(Dense(length, int(float(self.config[0].text())), self.config[1].currentText(), True if self.config[2].currentText() == "True" else False, self.config[3].currentText(), self.config[4].currentText()))
+            models["model_1"]["layers"].append(
+                Dense(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    True if self.config[2].currentText() == "True" else False, 
+                    self.config[3].currentText(),
+                    self.config[4].currentText()
+                    )
+                )
         elif self.layer_type == "Flatten":
-            models["model_1"]["layers"].append(Flatten(length))
+            models["model_1"]["layers"].append(
+                Flatten(
+                    length
+                    )
+                )
         elif self.layer_type == "Zero Padding 2d":
-            models["model_1"]["layers"].append(Zero_Padding_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text())))))
+            models["model_1"]["layers"].append(
+                Zero_Padding_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text())))
+                    )
+                )
         elif self.layer_type == "Average Pooling 2d":
-            models["model_1"]["layers"].append(Average_Pooling_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text()))), (int(float(self.config[2].text())), int(float(self.config[3].text()))), self.config[4].currentText()))
+            models["model_1"]["layers"].append(
+                Average_Pooling_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
         elif self.layer_type == "Max Pooling 2d":
-            models["model_1"]["layers"].append(Max_Pool_2d(length, (int(float(self.config[0].text())), int(float(self.config[1].text()))), (int(float(self.config[2].text())), int(float(self.config[3].text()))), self.config[4].currentText()))
+            models["model_1"]["layers"].append(
+                Max_Pool_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
         elif self.layer_type == "Convolution 2d":
-            models["model_1"]["layers"].append(Convolution_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+            models["model_1"]["layers"].append(
+                Convolution_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
         elif self.layer_type == "Convolution 2d Transpose":
-            models["model_1"]["layers"].append(Convolution_2d_Transpose(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+            models["model_1"]["layers"].append(
+                Convolution_2d_Transpose(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
         elif self.layer_type == "Depthwise Convolution 2d":
-            models["model_1"]["layers"].append(Depthwise_Conv_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText()))
+            models["model_1"]["layers"].append(
+                Depthwise_Conv_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
         elif self.layer_type == "Separable Convolution 2d":
-            models["model_1"]["layers"].append(Separable_Conv_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))), self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), int(float(self.config[8].text())), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText(), self.config[13].currentText()))
+            models["model_1"]["layers"].append(
+                Separable_Conv_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
+                    self.config[13].currentText()
+                    )
+                )
         elif self.layer_type == "Convolution LSTM 2d":
-            models["model_1"]["layers"].append(Conv_LSTM_2d(length, int(float(self.config[0].text())), (int(float(self.config[1].text())), int(float(self.config[2].text()))), (int(float(self.config[3].text())), int(float(self.config[4].text()))),  self.config[5].currentText(), (int(float(self.config[6].text())), int(float(self.config[7].text()))), self.config[8].currentText(), self.config[9].currentText(), self.config[10].currentText(), self.config[11].currentText(), self.config[12].currentText(), self.config[13].currentText(), float(self.config[14].text()), float(self.config[15].text()), int(float(self.config[16].text()))))
+            models["model_1"]["layers"].append(
+                Conv_LSTM_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),  
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    self.config[8].currentText(), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
+                    self.config[13].currentText(), 
+                    float(self.config[14].text()), 
+                    float(self.config[15].text()), 
+                    int(float(self.config[16].text()))
+                    )
+                )
         elif self.layer_type == "Simple RNN":
-            models["model_1"]["layers"].append(SimpleRNN(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), float(self.config[6].text()), float(self.config[7].text()), int(float(self.config[8].text()))))
+            models["model_1"]["layers"].append(
+                SimpleRNN(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    float(self.config[6].text()), 
+                    float(self.config[7].text()), 
+                    int(float(self.config[8].text()))
+                    )
+                )
         elif self.layer_type == "LSTM":
-            models["model_1"]["layers"].append(LSTM(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), self.config[6].currentText(), self.config[7].currentText(), float(self.config[8].text()), float(self.config[9].text()), int(float(self.config[10].text()))))
+            models["model_1"]["layers"].append(
+                LSTM(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].currentText(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
+                    int(float(self.config[10].text()))
+                    )
+                )
         elif self.layer_type == "GRU":
-            models["model_1"]["layers"].append(GRU(length, int(float(self.config[0].text())), self.config[1].currentText(), self.config[2].currentText(), self.config[3].currentText(), self.config[4].currentText(), self.config[5].currentText(), self.config[6].currentText(), self.config[7].isChecked(), float(self.config[8].text()), float(self.config[9].text()), int(float(self.config[10].text())), self.config[11].currentText()))
+            models["model_1"]["layers"].append(
+                GRU(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].isChecked(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
+                    int(float(self.config[10].text())), 
+                    self.config[11].currentText()
+                    )
+                )
 
         self.accept()
 
@@ -1704,17 +1856,18 @@ class ConfigureInputDialog(QDialog):
         buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         layout.addWidget(buttons)
 
-        buttons.accepted.connect(self.saveConfig)
+        buttons.accepted.connect(self.saveConfig) # Calls the saveConfig function once save button is pressed
         buttons.rejected.connect(self.reject)
         
     def selectDirectory(self):
-
+        # Prompts a select directory screen
         file_path = QFileDialog.getExistingDirectory(self, "Select directory")
         if file_path:  # Only update the label if a file path was selected
             self.file_path_label.setText(file_path)
-            models["input_parameters"]["root_directory"] = file_path
+            models["input_parameters"]["root_directory"] = file_path # Saves file path to main dictionary
 
     def saveConfig(self):
+        # Saves the Input shape size and normalization to main dictionary.
         models["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else models["input_parameters"]["input_shape1"]
         models["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else models["input_parameters"]["input_shape2"]
         models["input_parameters"]["normalized"] = self.config[2].isChecked()
