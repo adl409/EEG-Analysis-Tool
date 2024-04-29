@@ -1,66 +1,47 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QSlider, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox, QCheckBox
-from PySide6.QtCore import QRegularExpression, Qt
-from PySide6.QtGui import QRegularExpressionValidator
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6 import QtCore
 
 from layerClasses import *
 
 # Dictionary that hold configuration values and will eventually be passed to the backend
-models = {
-    "input_parameters": {
-        "input_shape1" : 0,
-        "input_shape2" : 0,
-        #EX dir
-        "root_directory" : "",
-        "normalized" : False
-    },
-    "test_parameters": {
-        "test_split" : 0.20,
-        "epochs" : 10,
-        "shuffle" : True
-    },
-    "model_1" : {
-        "save_model" : True, 
-        "save_file" : "mod1",
-        "active": True,
-        "layers": [
-            # Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
-        ]
-    },
-    "model_2" : {
-        "save_model" : False,
-        "save_file" : "mod2", 
-        "active": False,
-        "layers": [
-            # Max_Pool_2d(1)
-        ]
-    },
-    "model_3" : {
-        "save_model" : False,
-        "save_file" : "mod3", 
-        "active": False,
-        "layers": [
-            # Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_4" : {
-        "save_model" : False,
-        "save_file" : "mod4",
-        "active": False,
-        "layers": [
-            # Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_5" : {
-        "save_model" : False,
-        "save_file" : "mod5",
-        "active": False,
-        "layers": [
-            # Dense(1, 64)
-        ]
-    }
-}
+class neuralnetModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, data=None, **kwargs):
+        super(neuralnetModel, self).__init__(*args, **kwargs)
+        self.datadict = {
+            "input_parameters": {
+                "input_shape1" : 0,
+                "input_shape2" : 0,
+                "root_directory" : "./Van250Tot0",
+                "normalized" : False
+            },
+            "test_parameters": {
+                "test_split" : 0.20,
+                "epochs" : 10,
+                "shuffle" : True
+            },
+            "model_1" : {
+                "save_model" : True, 
+                "save_file" : "mod1",
+                "active": True,
+                "layers": [
+                    Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
+                ]
+            }
+        }
+
+    def data(self, index, role):
+        if role == QtCore.Qt.DisplayRole:
+            text = self.datadict.get("model_1").get("layers")[index.row()].layerType
+            return text
+
+    def rowCount(self, index):
+        return len(self.datadict.get("model_1").get("layers"))
+    
+nnet = neuralnetModel()
 
 class TestConfigDialog(QDialog):
 
@@ -125,9 +106,9 @@ class TestConfigDialog(QDialog):
 
     def saveConfig(self):
 
-        models["test_parameters"]["test_split"] = self.slider.value() / 100
-        models["test_parameters"]["epochs"] = float(self.epoch_input.text())
-        models["test_parameters"]["shuffle"] = self.checkbox.isChecked()
+        nnet.datadict["test_parameters"]["test_split"] = self.slider.value() / 100
+        nnet.datadict["test_parameters"]["epochs"] = float(self.epoch_input.text())
+        nnet.datadict["test_parameters"]["shuffle"] = self.checkbox.isChecked()
         
         self.accept()
 
@@ -1572,9 +1553,9 @@ class ConfigureAddLayerDialog(QDialog):
 
     def saveLayer(self):
         # Append to main dictionary the layer type the user wants to add
-        length = len(models["model_1"]["layers"])
+        length = len(nnet.datadict["model_1"]["layers"])
         if self.layer_type == "Dense":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Dense(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1585,20 +1566,20 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Flatten":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Flatten(
                     length
                     )
                 )
         elif self.layer_type == "Zero Padding 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Zero_Padding_2d(
                     length, 
                     (int(float(self.config[0].text())), int(float(self.config[1].text())))
                     )
                 )
         elif self.layer_type == "Average Pooling 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Average_Pooling_2d(
                     length, 
                     (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
@@ -1607,7 +1588,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Max Pooling 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Max_Pool_2d(
                     length, 
                     (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
@@ -1616,7 +1597,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Convolution_2d(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1632,7 +1613,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Convolution 2d Transpose":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Convolution_2d_Transpose(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1648,7 +1629,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Depthwise Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Depthwise_Conv_2d(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1664,7 +1645,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Separable Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Separable_Conv_2d(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1681,7 +1662,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Convolution LSTM 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Conv_LSTM_2d(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1701,7 +1682,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "Simple RNN":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 SimpleRNN(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1716,7 +1697,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "LSTM":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 LSTM(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1733,7 +1714,7 @@ class ConfigureAddLayerDialog(QDialog):
                     )
                 )
         elif self.layer_type == "GRU":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 GRU(
                     length, 
                     int(float(self.config[0].text())), 
@@ -1750,7 +1731,7 @@ class ConfigureAddLayerDialog(QDialog):
                     self.config[11].currentText()
                     )
                 )
-
+        nnet.layoutChanged.emit()
         self.accept()
 
 class AddLayerDialog(QDialog):
@@ -1777,6 +1758,7 @@ class AddLayerDialog(QDialog):
     def openConfigureAddLayerDialog(self):
         dialog = ConfigureAddLayerDialog(self.comboBox.currentText(), self)
         dialog.exec()
+        self.accept()
 
     def updateConfigureDialog(self, layer_type):
         # Update the configuration dialog when the layer type is changed
@@ -1864,13 +1846,13 @@ class ConfigureInputDialog(QDialog):
         file_path = QFileDialog.getExistingDirectory(self, "Select directory")
         if file_path:  # Only update the label if a file path was selected
             self.file_path_label.setText(file_path)
-            models["input_parameters"]["root_directory"] = file_path # Saves file path to main dictionary
+            nnet.datadict["input_parameters"]["root_directory"] = file_path # Saves file path to main dictionary
 
     def saveConfig(self):
         # Saves the Input shape size and normalization to main dictionary.
-        models["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else models["input_parameters"]["input_shape1"]
-        models["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else models["input_parameters"]["input_shape2"]
-        models["input_parameters"]["normalized"] = self.config[2].isChecked()
+        nnet.datadict["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else nnet.datadict["input_parameters"]["input_shape1"]
+        nnet.datadict["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else nnet.datadict["input_parameters"]["input_shape2"]
+        nnet.datadict["input_parameters"]["normalized"] = self.config[2].isChecked()
 
         self.accept()
 
@@ -1881,21 +1863,19 @@ class MainWindow(QMainWindow):
         # Main widget for the QMainWindow.
         main_widget = QWidget(self)
         self.setCentralWidget(main_widget)
-
         # Main layout for the central widget.
         main_layout = QVBoxLayout(main_widget)
 
-        # Tab widget setup.
-        tab_widget = QTabWidget()
-        for i in range(1, 7):
-            tab = QWidget()
-            layout = QVBoxLayout(tab)
-            label = QLabel(f"Content of Model {i}", tab)
-            layout.addWidget(label)
-            tab_widget.addTab(tab, f"Model {i}")
+        # self.display_frame = QFrame()
+        # self.display_frame.setFrameShape(QFrame.StyledPanel) #styled panel gives a visible border
+        # self.display_frame.setFrameShadow(QFrame.Raised) #gives a little shadow
+        # self.display_frame.setStyleSheet("QFrame { background-color: white; border: 2px solid black; }")  # Black border, 2px thick
 
-        # Adding the tab widget to the main layout with stretch factor.
-        main_layout.addWidget(tab_widget, 1)  # Add stretch to make sure it expands
+        # main_layout.addWidget(self.display_frame, 1)
+
+        self.todoView = QListView()
+        self.todoView.setModel(nnet)
+        main_layout.addWidget(self.todoView)
 
         # Buttons
         buttons_layout = QHBoxLayout()
@@ -1965,9 +1945,6 @@ def parseData(rootPath):
                 labelledData[i][0].append(updatedPath)
 
     return labelledData
-
-def getConfigs():
-    return models
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
