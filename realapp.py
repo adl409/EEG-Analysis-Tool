@@ -1888,6 +1888,7 @@ class MainWindow(QMainWindow):
         self.display_frame = QFrame()
         self.display_frame.setFrameShape(QFrame.StyledPanel) #styled panel gives a visible border
         self.display_frame.setFrameShadow(QFrame.Raised) #gives a little shadow
+        self.display_frame.setStyleSheet("QFrame { background-color: white; border: 2px solid black; }")  # Black border, 2px thick
 
         main_layout.addWidget(self.display_frame, 1)
 
