@@ -1,66 +1,47 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QFrame, QSlider, QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QMainWindow, QTabWidget, QWidget, QSizePolicy, QGroupBox, QComboBox, QCheckBox
-from PySide6.QtCore import QRegularExpression, Qt
-from PySide6.QtGui import QRegularExpressionValidator
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6 import QtCore
 
 from layerClasses import *
 
 # Dictionary that hold configuration values and will eventually be passed to the backend
-models = {
-    "input_parameters": {
-        "input_shape1" : 0,
-        "input_shape2" : 0,
-        #EX dir
-        "root_directory" : "",
-        "normalized" : False
-    },
-    "test_parameters": {
-        "test_split" : 0.20,
-        "epochs" : 10,
-        "shuffle" : True
-    },
-    "model_1" : {
-        "save_model" : True,
-        "save_file" : "mod1",
-        "active": True,
-        "layers": [
-            # Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
-        ]
-    },
-    "model_2" : {
-        "save_model" : False,
-        "save_file" : "mod2",
-        "active": False,
-        "layers": [
-            # Max_Pool_2d(1)
-        ]
-    },
-    "model_3" : {
-        "save_model" : False,
-        "save_file" : "mod3",
-        "active": False,
-        "layers": [
-            # Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_4" : {
-        "save_model" : False,
-        "save_file" : "mod4",
-        "active": False,
-        "layers": [
-            # Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_5" : {
-        "save_model" : False,
-        "save_file" : "mod5",
-        "active": False,
-        "layers": [
-            # Dense(1, 64)
-        ]
-    }
-}
+class neuralnetModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, data=None, **kwargs):
+        super(neuralnetModel, self).__init__(*args, **kwargs)
+        self.datadict = {
+            "input_parameters": {
+                "input_shape1" : 0,
+                "input_shape2" : 0,
+                "root_directory" : "./Van250Tot0",
+                "normalized" : False
+            },
+            "test_parameters": {
+                "test_split" : 0.20,
+                "epochs" : 10,
+                "shuffle" : True
+            },
+            "model_1" : {
+                "save_model" : True, 
+                "save_file" : "mod1",
+                "active": True,
+                "layers": [
+                    Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
+                ]
+            }
+        }
+
+    def data(self, index, role):
+        if role == QtCore.Qt.DisplayRole:
+            text = self.datadict.get("model_1").get("layers")[index.row()].layerType
+            return text
+
+    def rowCount(self, index):
+        return len(self.datadict.get("model_1").get("layers"))
+    
+nnet = neuralnetModel()
 
 class TestConfigDialog(QDialog):
 
@@ -125,10 +106,10 @@ class TestConfigDialog(QDialog):
 
     def saveConfig(self):
 
-        models["test_parameters"]["test_split"] = self.slider.value() / 100
-        models["test_parameters"]["epochs"] = float(self.epoch_input.text())
-        models["test_parameters"]["shuffle"] = self.checkbox.isChecked()
-
+        nnet.datadict["test_parameters"]["test_split"] = self.slider.value() / 100
+        nnet.datadict["test_parameters"]["epochs"] = float(self.epoch_input.text())
+        nnet.datadict["test_parameters"]["shuffle"] = self.checkbox.isChecked()
+        
         self.accept()
 
 class ConfigureAddLayerDialog(QDialog):
@@ -226,7 +207,7 @@ class ConfigureAddLayerDialog(QDialog):
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(bias_initializer)
-
+        
         self.config.append(bias_initializer)
 
         # Add widgets specific to configuring Dense layer
@@ -1025,7 +1006,7 @@ class ConfigureAddLayerDialog(QDialog):
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        float_validator = QRegularExpressionValidator(QRegularExpression('^0\.([0-9]{0,3})$'))
+        float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #filters
         filters_label = QLabel("Filters:")
@@ -1173,27 +1154,27 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout: (requires 0. before input is allowed)")
+        dropout_label = QLabel("Dropout:")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         clstm2d_dropout = QLineEdit()
         clstm2d_dropout.setPlaceholderText("Dropout")
-        clstm2d_dropout.setValidator(float_validator)
+        # clstm2d_dropout.setValidator(float_validator)
         layout.addWidget(clstm2d_dropout)
 
         self.config.append(clstm2d_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout: (requires 0. before input is allowed)")
+        recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         clstm2d_recurrent_dropout = QLineEdit()
         clstm2d_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
-        clstm2d_recurrent_dropout.setValidator(float_validator)
+        # clstm2d_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(clstm2d_recurrent_dropout)
 
         self.config.append(clstm2d_recurrent_dropout)
@@ -1218,7 +1199,7 @@ class ConfigureAddLayerDialog(QDialog):
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        float_validator = QRegularExpressionValidator(QRegularExpression('^0\.([0-9]{0,3})$'))
+        float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
         units_label = QLabel("Units:")
@@ -1278,27 +1259,27 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout: (requires 0. before input is allowed)")
+        dropout_label = QLabel("Dropout:")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         srnn_dropout = QLineEdit()
         srnn_dropout.setPlaceholderText("Dropout")
-        srnn_dropout.setValidator(float_validator)
+        # srnn_dropout.setValidator(float_validator)
         layout.addWidget(srnn_dropout)
 
         self.config.append(srnn_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout: (requires 0. before input is allowed)")
+        recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         srnn_recurrent_dropout = QLineEdit()
         srnn_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
-        srnn_recurrent_dropout.setValidator(float_validator)
+        # srnn_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(srnn_recurrent_dropout)
 
         self.config.append(srnn_recurrent_dropout)
@@ -1323,7 +1304,7 @@ class ConfigureAddLayerDialog(QDialog):
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        float_validator = QRegularExpressionValidator(QRegularExpression('^0\.([0-9]{0,3})$'))
+        float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
         units_label = QLabel("Units:")
@@ -1402,27 +1383,27 @@ class ConfigureAddLayerDialog(QDialog):
 
 
         #dropout
-        dropout_label = QLabel("Dropout: (requires 0. before input is allowed)")
+        dropout_label = QLabel("Dropout:")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         lstm_dropout = QLineEdit()
         lstm_dropout.setPlaceholderText("Dropout")
-        lstm_dropout.setValidator(float_validator)
+        # lstm_dropout.setValidator(float_validator)
         layout.addWidget(lstm_dropout)
 
         self.config.append(lstm_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout: (requires 0. before input is allowed)")
+        recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         lstm_recurrent_dropout = QLineEdit()
         lstm_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
-        lstm_recurrent_dropout.setValidator(float_validator)
+        # lstm_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(lstm_recurrent_dropout)
 
         self.config.append(lstm_recurrent_dropout)
@@ -1447,7 +1428,7 @@ class ConfigureAddLayerDialog(QDialog):
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        float_validator = QRegularExpressionValidator(QRegularExpression('^0\.([0-9]{0,3})$'))
+        float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
         units_label = QLabel("Units:")
@@ -1521,27 +1502,27 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(gru_unit_forget_bias)
 
         #dropout
-        dropout_label = QLabel("Dropout: (requires 0. before input is allowed)")
+        dropout_label = QLabel("Dropout:")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         gru_dropout = QLineEdit()
         gru_dropout.setPlaceholderText("Dropout")
-        gru_dropout.setValidator(float_validator)
+        # gru_dropout.setValidator(float_validator)
         layout.addWidget(gru_dropout)
 
         self.config.append(gru_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout: (requires 0. before input is allowed)")
+        recurrent_dropout_label = QLabel("Recurrent Dropout:")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         gru_recurrent_dropout = QLineEdit()
         gru_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
-        gru_recurrent_dropout.setValidator(float_validator)
+        # lstm_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(gru_recurrent_dropout)
 
         self.config.append(gru_recurrent_dropout)
@@ -1572,185 +1553,185 @@ class ConfigureAddLayerDialog(QDialog):
 
     def saveLayer(self):
         # Append to main dictionary the layer type the user wants to add
-        length = len(models["model_1"]["layers"])
+        length = len(nnet.datadict["model_1"]["layers"])
         if self.layer_type == "Dense":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Dense(
-                    length,
-                    int(float(self.config[0].text())),
-                    self.config[1].currentText(),
-                    True if self.config[2].currentText() == "True" else False,
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    True if self.config[2].currentText() == "True" else False, 
                     self.config[3].currentText(),
                     self.config[4].currentText()
                     )
                 )
         elif self.layer_type == "Flatten":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Flatten(
                     length
                     )
                 )
         elif self.layer_type == "Zero Padding 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Zero_Padding_2d(
-                    length,
+                    length, 
                     (int(float(self.config[0].text())), int(float(self.config[1].text())))
                     )
                 )
         elif self.layer_type == "Average Pooling 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Average_Pooling_2d(
-                    length,
-                    (int(float(self.config[0].text())), int(float(self.config[1].text()))),
-                    (int(float(self.config[2].text())), int(float(self.config[3].text()))),
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
                     self.config[4].currentText()
                     )
                 )
         elif self.layer_type == "Max Pooling 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Max_Pool_2d(
-                    length,
-                    (int(float(self.config[0].text())), int(float(self.config[1].text()))),
-                    (int(float(self.config[2].text())), int(float(self.config[3].text()))),
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
                     self.config[4].currentText()
                     )
                 )
         elif self.layer_type == "Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Convolution_2d(
-                    length,
-                    int(float(self.config[0].text())),
-                    (int(float(self.config[1].text())), int(float(self.config[2].text()))),
-                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),
-                    self.config[5].currentText(),
-                    (int(float(self.config[6].text())), int(float(self.config[7].text()))),
-                    int(float(self.config[8].text())),
-                    self.config[9].currentText(),
-                    self.config[10].currentText(),
-                    self.config[11].currentText(),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
                     self.config[12].currentText()
                     )
                 )
         elif self.layer_type == "Convolution 2d Transpose":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Convolution_2d_Transpose(
-                    length,
-                    int(float(self.config[0].text())),
-                    (int(float(self.config[1].text())), int(float(self.config[2].text()))),
-                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),
-                    self.config[5].currentText(),
-                    (int(float(self.config[6].text())), int(float(self.config[7].text()))),
-                    int(float(self.config[8].text())),
-                    self.config[9].currentText(),
-                    self.config[10].currentText(),
-                    self.config[11].currentText(),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
                     self.config[12].currentText()
                     )
                 )
         elif self.layer_type == "Depthwise Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Depthwise_Conv_2d(
-                    length,
-                    int(float(self.config[0].text())),
-                    (int(float(self.config[1].text())), int(float(self.config[2].text()))),
-                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),
-                    self.config[5].currentText(),
-                    (int(float(self.config[6].text())), int(float(self.config[7].text()))),
-                    int(float(self.config[8].text())),
-                    self.config[9].currentText(),
-                    self.config[10].currentText(),
-                    self.config[11].currentText(),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
                     self.config[12].currentText()
                     )
                 )
         elif self.layer_type == "Separable Convolution 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Separable_Conv_2d(
-                    length,
-                    int(float(self.config[0].text())),
-                    (int(float(self.config[1].text())), int(float(self.config[2].text()))),
-                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),
-                    self.config[5].currentText(),
-                    (int(float(self.config[6].text())), int(float(self.config[7].text()))),
-                    int(float(self.config[8].text())),
-                    self.config[9].currentText(),
-                    self.config[10].currentText(),
-                    self.config[11].currentText(),
-                    self.config[12].currentText(),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
                     self.config[13].currentText()
                     )
                 )
         elif self.layer_type == "Convolution LSTM 2d":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 Conv_LSTM_2d(
-                    length,
-                    int(float(self.config[0].text())),
-                    (int(float(self.config[1].text())), int(float(self.config[2].text()))),
-                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),
-                    self.config[5].currentText(),
-                    (int(float(self.config[6].text())), int(float(self.config[7].text()))),
-                    self.config[8].currentText(),
-                    self.config[9].currentText(),
-                    self.config[10].currentText(),
-                    self.config[11].currentText(),
-                    self.config[12].currentText(),
-                    self.config[13].currentText(),
-                    float(self.config[14].text()),
-                    float(self.config[15].text()),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),  
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    self.config[8].currentText(), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
+                    self.config[13].currentText(), 
+                    float(self.config[14].text()), 
+                    float(self.config[15].text()), 
                     int(float(self.config[16].text()))
                     )
                 )
         elif self.layer_type == "Simple RNN":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 SimpleRNN(
-                    length,
-                    int(float(self.config[0].text())),
-                    self.config[1].currentText(),
-                    self.config[2].currentText(),
-                    self.config[3].currentText(),
-                    self.config[4].currentText(),
-                    self.config[5].currentText(),
-                    float(self.config[6].text()),
-                    float(self.config[7].text()),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    float(self.config[6].text()), 
+                    float(self.config[7].text()), 
                     int(float(self.config[8].text()))
                     )
                 )
         elif self.layer_type == "LSTM":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 LSTM(
-                    length,
-                    int(float(self.config[0].text())),
-                    self.config[1].currentText(),
-                    self.config[2].currentText(),
-                    self.config[3].currentText(),
-                    self.config[4].currentText(),
-                    self.config[5].currentText(),
-                    self.config[6].currentText(),
-                    self.config[7].currentText(),
-                    float(self.config[8].text()),
-                    float(self.config[9].text()),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].currentText(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
                     int(float(self.config[10].text()))
                     )
                 )
         elif self.layer_type == "GRU":
-            models["model_1"]["layers"].append(
+            nnet.datadict["model_1"]["layers"].append(
                 GRU(
-                    length,
-                    int(float(self.config[0].text())),
-                    self.config[1].currentText(),
-                    self.config[2].currentText(),
-                    self.config[3].currentText(),
-                    self.config[4].currentText(),
-                    self.config[5].currentText(),
-                    self.config[6].currentText(),
-                    self.config[7].isChecked(),
-                    float(self.config[8].text()),
-                    float(self.config[9].text()),
-                    int(float(self.config[10].text())),
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].isChecked(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
+                    int(float(self.config[10].text())), 
                     self.config[11].currentText()
                     )
                 )
-
+        nnet.layoutChanged.emit()
         self.accept()
 
 class AddLayerDialog(QDialog):
@@ -1777,6 +1758,7 @@ class AddLayerDialog(QDialog):
     def openConfigureAddLayerDialog(self):
         dialog = ConfigureAddLayerDialog(self.comboBox.currentText(), self)
         dialog.exec()
+        self.accept()
 
     def updateConfigureDialog(self, layer_type):
         # Update the configuration dialog when the layer type is changed
@@ -1858,19 +1840,19 @@ class ConfigureInputDialog(QDialog):
 
         buttons.accepted.connect(self.saveConfig) # Calls the saveConfig function once save button is pressed
         buttons.rejected.connect(self.reject)
-
+        
     def selectDirectory(self):
         # Prompts a select directory screen
         file_path = QFileDialog.getExistingDirectory(self, "Select directory")
         if file_path:  # Only update the label if a file path was selected
             self.file_path_label.setText(file_path)
-            models["input_parameters"]["root_directory"] = file_path # Saves file path to main dictionary
+            nnet.datadict["input_parameters"]["root_directory"] = file_path # Saves file path to main dictionary
 
     def saveConfig(self):
         # Saves the Input shape size and normalization to main dictionary.
-        models["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else models["input_parameters"]["input_shape1"]
-        models["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else models["input_parameters"]["input_shape2"]
-        models["input_parameters"]["normalized"] = self.config[2].isChecked()
+        nnet.datadict["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else nnet.datadict["input_parameters"]["input_shape1"]
+        nnet.datadict["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else nnet.datadict["input_parameters"]["input_shape2"]
+        nnet.datadict["input_parameters"]["normalized"] = self.config[2].isChecked()
 
         self.accept()
 
@@ -1881,28 +1863,19 @@ class MainWindow(QMainWindow):
         # Main widget for the QMainWindow.
         main_widget = QWidget(self)
         self.setCentralWidget(main_widget)
-
         # Main layout for the central widget.
         main_layout = QVBoxLayout(main_widget)
 
-        self.display_frame = QFrame()
-        self.display_frame.setFrameShape(QFrame.StyledPanel) #styled panel gives a visible border
-        self.display_frame.setFrameShadow(QFrame.Raised) #gives a little shadow
-        self.display_frame.setStyleSheet("QFrame { background-color: white; border: 2px solid black; }")  # Black border, 2px thick
+        # self.display_frame = QFrame()
+        # self.display_frame.setFrameShape(QFrame.StyledPanel) #styled panel gives a visible border
+        # self.display_frame.setFrameShadow(QFrame.Raised) #gives a little shadow
+        # self.display_frame.setStyleSheet("QFrame { background-color: white; border: 2px solid black; }")  # Black border, 2px thick
 
-        main_layout.addWidget(self.display_frame, 1)
+        # main_layout.addWidget(self.display_frame, 1)
 
-        # # Tab widget setup.
-        # tab_widget = QTabWidget()
-        # for i in range(1, 7):
-        #     tab = QWidget()
-        #     layout = QVBoxLayout(tab)
-        #     label = QLabel(f"Content of Model {i}", tab)
-        #     layout.addWidget(label)
-        #     tab_widget.addTab(tab, f"Model {i}")
-
-        # # Adding the tab widget to the main layout with stretch factor.
-        # main_layout.addWidget(tab_widget, 1)  # Add stretch to make sure it expands
+        self.todoView = QListView()
+        self.todoView.setModel(nnet)
+        main_layout.addWidget(self.todoView)
 
         # Buttons
         buttons_layout = QHBoxLayout()
@@ -1945,7 +1918,7 @@ class MainWindow(QMainWindow):
     def openAddLayerModal(self):
         dialog = AddLayerDialog(self)
         dialog.exec()
-
+    
     def openTestConfigModal(self):
         dialog = TestConfigDialog(self)
         dialog.exec()
@@ -1972,9 +1945,6 @@ def parseData(rootPath):
                 labelledData[i][0].append(updatedPath)
 
     return labelledData
-
-def getConfigs():
-    return models
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
