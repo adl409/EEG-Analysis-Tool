@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         self.train_button.clicked.connect(self.train_model)
         self.layout.addWidget(self.train_button)
 
-        self.result_label = QLabel("Results will appear here", self)
+        self.result_label = QLabel("Results: ", self)
         self.layout.addWidget(self.result_label)
 
         # Placeholder for TensorFlow model
