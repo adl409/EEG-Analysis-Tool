@@ -1,3 +1,4 @@
+
 class Layer:
     def __init__(self) -> None:
         pass
@@ -52,7 +53,7 @@ class Max_Pool_2d(Layer):
     
 class Convolution_2d(Layer):
     
-    def __init__(self,index,filters=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
+    def __init__(self,index,filter=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
                  groups=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform',bias_initializer='zeros'):
         
         self.filter=filter
@@ -70,7 +71,7 @@ class Convolution_2d(Layer):
 
 class Convolution_2d_Transpose(Layer):
     
-    def __init__(self,index,filters=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
+    def __init__(self,index,filter=None,kernel_size=None,strides=(1,1),padding='valid', dialation_rate=(1,1),
                  groups=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform',bias_initializer='zeros'):
         
         self.filter=filter
@@ -104,7 +105,7 @@ class Depthwise_Conv_2d(Layer):
 
 class Separable_Conv_2d(Layer):
      
-     def __init__(self,index,filters=None,kernel_size=None,strides=(1,1),padding='valid', 
+     def __init__(self,index,filter=None,kernel_size=None,strides=(1,1),padding='valid', 
                   dialation_rate=(1,1),depth_multiplier=1, activation=None, use_bias=True, 
                   depthwise_initializer='glorot_uniform',pointwise_initializer='glorot_uniform',bias_initializer='zeros'):
         
@@ -124,12 +125,12 @@ class Separable_Conv_2d(Layer):
 
 class Conv_LSTM_2d(Layer):
     
-   def __init__(self, index, filters, kernel_size=(3, 3), strides=(1, 1), padding='valid', 
+   def __init__(self, index, filter, kernel_size=(3, 3), strides=(1, 1), padding='valid', 
                  data_format=None, dilation_rate=(1, 1), activation='tanh', recurrent_activation='sigmoid',
                  use_bias=True, kernel_initializer='glorot_uniform', recurrent_initializer='orthogonal',
                  bias_initializer='zeros', dropout=0.0, recurrent_dropout=0.0, seed=None):
         
-        self.filters = filters
+        self.filters = filter
         self.kernel_size = kernel_size
         self.strides = strides
         self.padding = padding
@@ -205,4 +206,3 @@ class GRU(Layer):
         self.reset_after=reset_after
         self.layerType = "gru"
         self.displayName = "Gated Recurrent Unit"
-
