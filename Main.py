@@ -1190,7 +1190,7 @@ class ConfigureAddLayerDialog(QDialog):
                     Dense(
                         length, 
                         int(float(self.config[0].text())), 
-                        self.config[1].currentText(), 
+                        None if self.config[1].currentText() == "none" else self.config[1].currentText(), 
                         True if self.config[2].currentText() == "True" else False, 
                         self.config[3].currentText(),
                         self.config[4].currentText()
@@ -1237,7 +1237,7 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[5].currentText(), 
                         (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
                         int(float(self.config[8].text())), 
-                        self.config[9].currentText(), 
+                        None if self.config[9].currentText() == "none" else self.config[9].currentText(),
                         self.config[10].currentText(), 
                         self.config[11].currentText(), 
                         self.config[12].currentText()
@@ -2777,7 +2777,7 @@ class EditLayerDialog(QDialog):
                 Dense(
                     length, 
                     int(float(self.config[0].text())), 
-                    self.config[1].currentText(), 
+                    None if self.config[1].currentText() == "none" else self.config[1].currentText(), 
                     True if self.config[2].currentText() == "True" else False, 
                     self.config[3].currentText(),
                     self.config[4].currentText()
@@ -2824,7 +2824,7 @@ class EditLayerDialog(QDialog):
                     self.config[5].currentText(), 
                     (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
                     int(float(self.config[8].text())), 
-                    self.config[9].currentText(), 
+                    None if self.config[9].currentText() == "none" else self.config[9].currentText(), 
                     self.config[10].currentText(), 
                     self.config[11].currentText(), 
                     self.config[12].currentText()
