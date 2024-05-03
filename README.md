@@ -12,25 +12,25 @@ The goal of this project is to create a functional AI building app that can aid 
 ## Installation Requirements
 
 ### Checking If You Have Pip
-Step 1: Open PowerShell
-Step 2: Type in the command pip help
-Step 3: Check if you have pip or not
+Step 1: Open PowerShell <br>
+Step 2: Type in the command pip help <br>
+Step 3: Check if you have pip or not <br>
 
 
 ### How to Install Pip
-Step 1: Open PowerShell
-Step 2: Run this command curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-Step 3: Run this command next python get-pip.py
-Step 4: Check if it is installed via this command python -m pip help
+Step 1: Open PowerShell <br>
+Step 2: Run this command curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py <br>
+Step 3: Run this command next python get-pip.py <br>
+Step 4: Check if it is installed via this command python -m pip help <br>
 
 ### Adding Pip to Path
-Step 1: Open Start menu and search for Environmental Variables and open it
-Step 2: Click Environmental Variables
-Step 3: Double-Click the path variable to edit it
-Step 4: Select New and add the directory where PIP is installed
-Step 5: Save changes by clicking okay
-Step 6: Open PowerShell and run this command pip config -v list
+Step 1: Open Start menu and search for Environmental Variables and open it <br>
+Step 2: Click Environmental Variables <br>
+Step 3: Double-Click the path variable to edit it <br>
+Step 4: Select New and add the directory where PIP is installed <br>
+Step 5: Save changes by clicking okay <br>
+Step 6: Open PowerShell and run this command pip config -v list <br>
 
 ### Installing Packages for pip
-Step 1: Open PowerShell
-Step 2: Run this command pip install -r requirements.txt
+Step 1: Open PowerShell <br>
+Step 2: Run this command pip install -r requirements.txt <br>
