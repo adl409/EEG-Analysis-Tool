@@ -2,65 +2,36 @@ from layerClasses import *
 import tensorflow as tf
 import numpy as np
 from dataParser import *
-import time
 from sklearn.model_selection import train_test_split
 import os
-import pandas as pd
+from contextlib import redirect_stdout
+
+
+defaults = {
+    "standard": [Flatten(0), Dense(0, 64, "relu"), Dense(0,64,"relu")],
+    "cnn": [Convolution_2d(0,filters=16, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=32, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=64, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)), Flatten(0), Dense(0,64), Dense(0,32) ],
+    "rnn": [SimpleRNN(0,16), Dense(0, 64)]
+}
 
 models = {
     "input_parameters": {
         "input_shape1" : 128,
         "input_shape2" : 65,
-        #EX dir
         "root_directory" : "./Van250Tot0",
         "normalized" : False
     },
     "test_parameters": {
         "test_split" : 0.20,
         "epochs" : 10,
-        #MAYBE? Need more research
-        "loss_function": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         "shuffle" : True
     },
     "model_1" : {
         "save_model" : True, 
-        "save_file" : "mod1",
+        "save_file" : "saveFile2.h",
         "active": True,
-        "layers": [
-            Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu")
-        ]
-    },
-    "model_2" : {
-        "save_model" : False,
-        "save_file" : "mod2", 
-        "active": False,
-        "layers": [
-            Max_Pool_2d(1)
-        ]
-    },  
-    "model_3" : {
-        "save_model" : False,
-        "save_file" : "mod3", 
-        "active": False,
-        "layers": [
-            Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_4" : {
-        "save_model" : False,
-        "save_file" : "mod4",
-        "active": False,
-        "layers": [
-            Dense(1, 64), Flatten(2)
-        ]
-    },
-    "model_5" : {
-        "save_model" : False,
-        "save_file" : "mod5",
-        "active": False,
-        "layers": [
-            Dense(1, 64)
-        ]
+        "layers": #[SimpleRNN(0, 2)]
+        defaults["rnn"]
+        #[Max_Pool_2d(2, pool_size=(2,2)),SimpleRNN(0,2), Dense(0,10), Flatten(0)]
     }
 }
 
@@ -82,7 +53,7 @@ def parseData(rootPath):
     data = []
     labels = []
 
-    visited = set()
+    visited = []
     label_nums = {}
     counter = 0
 
@@ -96,7 +67,7 @@ def parseData(rootPath):
             
             # Adding label to visited label set if not yet added
             if label not in visited:
-                visited.add(label)
+                visited.append(label)
                 # need labels to be integer values
                 # storing int values in dict
                 label_nums[label] = counter
@@ -122,23 +93,17 @@ def parseData(rootPath):
     print("Shape of Data: ", data.shape)
     print("Label Numbers: ", label_nums)
 
-    return (data, labels)
-            
-    
+    return [(data, labels), label_nums]
     
             ##iterating through all files of given label
             #for file in 
 
             # Need output in form of 3d np array and list of labels
 
-def make_model(modelNum):
+def make_model(models, numLabels):
 
     # Pulling layers from dict
-    layers = models.get("model_" + str(modelNum)).get("layers")
-
-    # Sorting by index value. Not sure if necessary; depends on if frontend
-    # displays layers based on index in array or index value. 
-    layers.sort(key=lambda x: x.index)  
+    layers = models.get("model_1").get("layers") 
 
     # Creating model
     
@@ -148,7 +113,29 @@ def make_model(modelNum):
     inputShape1 = models.get("input_parameters").get("input_shape1")
     inputShape2 = models.get("input_parameters").get("input_shape2")
     # Fourth dim added to make compatible with 2d functions
-    model.add(tf.keras.layers.Input(shape=(int(inputShape1), int(inputShape2), 1)))
+
+    #Setting input size
+    # If model has RNN layers, dont add batch size, else add batch size    
+    rnn = False
+    cnn = False
+    for x in layers:
+        if(x.layerType == "simplernn" or x.layerType == "lstm" or x.layerType == "gru"):
+            rnn = True
+        if(x.layerType == "convolution_2d" or x.layerType == "convolution_2d_transpose" or x.layerType == "max_pool_2d" or x.layerType == "average_pooling_2d"):
+            cnn = True
+    
+    if(cnn and rnn):
+        print("ERROR: Invalid Layer Configuration")
+        return tf.keras.Sequential()
+    else:
+        if rnn: 
+            model.add(tf.keras.layers.Input(shape=(int(inputShape1), int(inputShape2))))
+
+        else:
+            model.add(tf.keras.layers.Input(shape=(int(inputShape1), int(inputShape2), 1)))
+
+
+    addFlat = True    
 
     # Adding layers based on dict
     for layer in layers:
@@ -159,6 +146,7 @@ def make_model(modelNum):
             
             case "flatten": 
                 model.add(tf.keras.layers.Flatten())
+                addFlat = False
 
             case "zero_padding_2d":
                 model.add(tf.keras.layers.ZeroPadding2D(padding = layer.padding))
@@ -170,36 +158,33 @@ def make_model(modelNum):
                 model.add(tf.keras.layers.MaxPooling2D(pool_size=layer.pool_size, strides = layer.strides, padding = layer.padding))
 
             case "convolution_2d":
-                model.add(tf.keras.layers.Conv2d(filters = layer.filter, kernel_size = layer.kernel_size, strides = layer.strides, padding = layer.padding, dialation_rate = layer.dialation_rate, groups = layer.groups, activaiton = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, bias_initializer = layer.bias_initializer))
+                print(layer.filter)
+                model.add(tf.keras.layers.Conv2D(filters = layer.filter, kernel_size = layer.kernel_size, strides = layer.strides, padding = layer.padding, dilation_rate = layer.dialation_rate, groups = layer.groups, activation = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, bias_initializer = layer.bias_initializer))
 
             case "convolution_2d_transpose":
-                model.add(tf.keras.layers.Conv2dTranspose(filters = layer.filter, kernel_size = layer.kernel_size, strides = layer.strides, padding = layer.padding, dialation_rate = layer.dialation_rate, groups = layer.groups, activaiton = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, bias_initializer = layer.bias_initializer))
-
-            case "depthwise_conv_2d":
-                model.add(tf.keras.layers.DepthwiseConv2d(kernel_size=layer.kernel_size, strides = layer.strides, padding = layer.padding, dialation_rate = layer.dialation_rate, depth_multiplier = layer.depth_multiplier, activation = layer.activation, use_bias = layer.use_bias, depthwise_initializer = layer.depthwise_initializer, bias_initializer = layer.bias_initializer))
-
-            case "separable_conv_2d":
-                print(layer.layerType)
-
-            case "conv_lstm_2d":
-                print(layer.layerType)
-
+                model.add(tf.keras.layers.Conv2DTranspose(filters = layer.filter, kernel_size = layer.kernel_size, strides = layer.strides, padding = layer.padding, dilation_rate = layer.dialation_rate, groups = layer.groups, activaiton = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, bias_initializer = layer.bias_initializer))
+            
             case "simplernn":
-                print(layer.layerType)
+                model.add(tf.keras.layers.SimpleRNN(units = layer.units, activation = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, recurrent_initializer = layer.recurrent_initializer, bias_initializer = layer.bias_initializer, dropout = layer.dropout, recurrent_dropout = layer.recurrent_dropout))
 
             case "lstm":
-                print(layer.layerType)
+                model.add(tf.keras.layers.LSTM(units = layer.units, activation = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, recurrent_initializer = layer.recurrent_initializer, bias_initializer = layer.bias_initializer, dropout = layer.dropout, recurrent_dropout = layer.recurrent_dropout, seed = layer.seed, unit_forget_bias = layer.unit_forget_bias, recurrent_activation = layer.recurrent_activation))
                 
             case "gru":
-                print(layer.layerType)
+                 model.add(tf.keras.layers.GRU(units = layer.units, activation = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, recurrent_initializer = layer.recurrent_initializer, bias_initializer = layer.bias_initializer, dropout = layer.dropout, recurrent_dropout = layer.recurrent_dropout, seed = layer.seed, unit_forget_bias = layer.unit_forget_bias, recurrent_activation = layer.recurrent_activation, reset_after = layer.reset_after))
 
             case _ :
                 print("Error Determining layer type...")
+    
+    if addFlat:
+        model.add(tf.keras.layers.Flatten())
+    # Adding output layer with number of outputs corresponding to number of labels
+    model.add(tf.keras.layers.Dense(numLabels))
 
     return model
 
-def train_test_model(data, labels, model, modelNum):
-     
+def train_test_model(data, labels, model, models):
+
     data_train, data_test, labels_train, labels_test = train_test_split(data, labels , random_state=104,test_size=models.get("test_parameters").get("test_split"), shuffle=models.get("test_parameters").get("shuffle"))
      
     model.compile(optimizer='adam',
@@ -210,33 +195,54 @@ def train_test_model(data, labels, model, modelNum):
 
     test_loss, test_acc = model.evaluate(data_test,  labels_test, verbose=2)
 
-    if(models.get("model_" + str(modelNum)).get("save_model")):
-        model.save(f'./'+ models.get("model_" + str(modelNum)).get("save_file") +f'_accuracy{round(test_acc, 3)*1000}.keras')
+    if(models.get("model_1").get("save_model")):
+        model.save(f'./'+ models.get("model_1").get("save_file") +f'_accuracy{round(test_acc, 3)*100}.keras')
 
-def process_models():
+    return test_loss, test_acc
 
-    active_models_indexs = []
-    active_models = []
+def process_model(models):
 
-    # Determining active models
-    for i in range(1,6):
-        if(models.get("model_" + str(i)).get("active")):
-            active_models_indexs.append(i)
+    # Collecting input data
+    parseInfo = parseData(models.get("input_parameters").get("root_directory"))
+    (data, labels) = parseInfo[0]
+    labelDict = parseInfo[1]
 
-    # Making models for actives
-    for index in active_models_indexs:
-        model = make_model(index)
-        model.summary()
-        active_models.append(model)
+    # Making model
+    model = make_model(models, len(labelDict))
+    model.summary()  
 
-    # Insert Wen's function here
-    (data, labels) = parseData(models.get("input_parameters").get("root_directory"))
+    # Training model
+    loss, accuracy = train_test_model(data, labels, model, models)
 
-    for i in range(len(active_models)):
-        modelNum = active_models_indexs[i]
-        train_test_model(data, labels, active_models[i], modelNum)
+    # Creating result summary
+    with open("result.txt", "w+") as result:
+        
+        result.write("---Labels---\n\n")
+        result.write("(Label: value)\n")
+        for key in labelDict:
+            result.write(str(key))
+            result.write(": ")
+            result.write(str(labelDict[key]))
+            result.write("\n")
+
+        result.write("\n---Model Summary---\n\n")
+        
+        with redirect_stdout(result):
+            model.summary()
+
+        result.write("\n\n---Testing Summary---\n\n")
+        result.write("Testing Accuracy: ")
+        result.write(str(round(accuracy, 4)*100)[0:5])
+        result.write("%")
+        result.write("\nTesting Loss: ")
+        result.write(str(loss))
+
+        if(models.get("model_1").get("save_model")):
+            result.write("\n\nModel saved to: ")
+            result.write(models.get("model_1").get("save_file"))
+            result.write("\n")
 
 def main():
-    process_models()
+    process_model(models)
 
 main()

@@ -4,8 +4,16 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6 import QtCore
+from eegBuilderBackend import *
+
 
 from layerClasses import *
+
+defaults = {
+    "Standard Neural Network": [Flatten(0),Dense(0, 64), Dense(0,64,"relu")],
+    "Convolutional NN": [Convolution_2d(0,filters=16, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=32, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=64, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)), Flatten(0), Dense(0,64), Dense(0,32) ],
+    "Recurrent NN": [SimpleRNN(0,16)]
+}
 
 # Dictionary that hold configuration values and will eventually be passed to the backend
 class neuralnetModel(QtCore.QAbstractListModel):
@@ -28,7 +36,7 @@ class neuralnetModel(QtCore.QAbstractListModel):
                 "save_file" : "mod1",
                 "active": True,
                 "layers": [
-                    Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu"), Flatten(4)
+                    #Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu"), Flatten(4)
                 ]
             }
         }
@@ -40,7 +48,7 @@ class neuralnetModel(QtCore.QAbstractListModel):
 
     def rowCount(self, index):
         return len(self.datadict.get("model_1").get("layers"))
-    
+
 nnet = neuralnetModel()
 index = -1
 class TestConfigDialog(QDialog):
@@ -107,7 +115,7 @@ class TestConfigDialog(QDialog):
     def saveConfig(self):
 
         nnet.datadict["test_parameters"]["test_split"] = self.slider.value() / 100
-        nnet.datadict["test_parameters"]["epochs"] = float(self.epoch_input.text())
+        nnet.datadict["test_parameters"]["epochs"] = int(float(self.epoch_input.text()))
         nnet.datadict["test_parameters"]["shuffle"] = self.checkbox.isChecked()
         
         self.accept()
@@ -3680,6 +3688,190 @@ class EditLayerDialog(QDialog):
         # Add widgets specific to configuring layer
         pass
 
+    def saveLayer(self):
+        
+        length = len(nnet.datadict["model_1"]["layers"])
+        
+        global index
+        
+        if self.layer_type == "Dense":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Dense(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    True if self.config[2].currentText() == "True" else False, 
+                    self.config[3].currentText(),
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "Flatten":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Flatten(
+                    length
+                    )
+                )
+        elif self.layer_type == "Zero Padding 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Zero_Padding_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text())))
+                    )
+                )
+        elif self.layer_type == "Average Pooling 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Average_Pooling_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "Max Pooling 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Max_Pool_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "Convolution 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Convolution_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
+        elif self.layer_type == "Convolution 2d Transpose":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Convolution_2d_Transpose(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
+        elif self.layer_type == "Depthwise Convolution 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Depthwise_Conv_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
+        elif self.layer_type == "Separable Convolution 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Separable_Conv_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
+                    self.config[13].currentText()
+                    )
+                )
+        elif self.layer_type == "Convolution LSTM 2d":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                Conv_LSTM_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))),  
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    self.config[8].currentText(), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText(), 
+                    self.config[13].currentText(), 
+                    float(self.config[14].text()), 
+                    float(self.config[15].text()), 
+                    int(float(self.config[16].text()))
+                    )
+                )
+        elif self.layer_type == "Simple RNN":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                SimpleRNN(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    float(self.config[6].text()), 
+                    float(self.config[7].text()), 
+                    int(float(self.config[8].text()))
+                    )
+                )
+        elif self.layer_type == "LSTM":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                LSTM(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].currentText(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
+                    int(float(self.config[10].text()))
+                    )
+                )
+        elif self.layer_type == "GRU":
+            nnet.datadict["model_1"]["layers"].insert(0,
+                GRU(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].isChecked(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text()), 
+                    int(float(self.config[10].text())), 
+                    self.config[11].currentText()
+                    )
+                )       
+
 class UsePresetDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -3691,7 +3883,7 @@ class UsePresetDialog(QDialog):
         self.comboBox = QComboBox()
 
         #Options for it
-        self.comboBox.addItems(["Standard Neural Network", "Convolutional NN", "Recurrent NN", "EEGNET-like"])
+        self.comboBox.addItems(["Standard Neural Network", "Convolutional NN", "Recurrent NN"])
         layout.addWidget(self.comboBox)
 
         #Dialog buttons
@@ -3699,16 +3891,54 @@ class UsePresetDialog(QDialog):
         layout.addWidget(self.buttons)
 
         #Connect buttons
-        self.buttons.accepted.connect(self.accept)
+        self.buttons.accepted.connect(self.confirmPreset)
         self.buttons.rejected.connect(self.reject)
 
         self.setMinimumSize(300, 100)
+
+    def confirmPreset(self):
+        dialog = ConfirmPresetDialog(self.comboBox.currentText(), self)
+        dialog.exec()
+        self.accept()
+
+class ConfirmPresetDialog(QDialog):
+
+    def __init__(self, preset, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Confirm Preset")
+
+        layout = QVBoxLayout(self)
+
+        self.preset = preset
+
+        #slider for testing split
+        self.label = QLabel('Are you sure you want to use this preset?\nDoing so will delete your previous layers')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        #Dialog buttons
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
+        layout.addWidget(self.buttons)
+
+        #Connect buttons
+        self.buttons.accepted.connect(self.usePreset)
+        self.buttons.rejected.connect(self.reject)
+
+        self.setMinimumSize(300, 100)
+
+    def usePreset(self):     
+        
+        nnet.datadict["model_1"]["layers"] = []
+        for layer in defaults[self.preset]:
+            nnet.datadict["model_1"]["layers"].append(layer)
+        nnet.layoutChanged.emit()
+        self.accept()
 
 class ConfigureInputDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configure Input")
-
+        self.setMinimumSize(400,250)
         self.config = []
 
         layout = QVBoxLayout(self)
@@ -3855,6 +4085,8 @@ class MainWindow(QMainWindow):
 
         self.edit_layer_button.clicked.connect(self.openEditLayerModal)
 
+        self.train_button.clicked.connect(self.trainModel)
+
 
         # Adjust the main window's size to ensure content is visible.
         self.setMinimumSize(800, 600)
@@ -3905,30 +4137,8 @@ class MainWindow(QMainWindow):
         else:
             index = -1
 
-        
-
-def parseData(rootPath):
-
-    labelledData = []
-    visited = set()
-
-    for participant in os.listdir(rootPath):
-
-        labels = os.path.join(rootPath, participant)
-
-        for i, label in enumerate(os.listdir(labels)):
-            if label not in visited:
-                data = [[], label]
-                labelledData.append(data)
-                visited.add(label)
-
-            files = os.path.join(labels, label)
-            for file in os.listdir(files):
-                updatedPath = os.path.join(files, file)
-
-                labelledData[i][0].append(updatedPath)
-
-    return labelledData
+    def trainModel(self):
+        process_model(nnet.datadict)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
