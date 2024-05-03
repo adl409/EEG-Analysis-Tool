@@ -1076,12 +1076,77 @@ class ConfigureAddLayerDialog(QDialog):
         # Add widgets specific to configuring layer
         pass
 
+    def RNNlayerCompatibilityChecker(self):
+        for layer in nnet.datadict["model_1"]["layers"]:
+            if isinstance(layer, (SimpleRNN, LSTM, GRU)):
+                return True
+        return False
+    
+    def CNNlayerCompatibilityChecker(self):
+        for layer in nnet.datadict["model_1"]["layers"]:
+            if isinstance(layer, (Zero_Padding_2d, Average_Pooling_2d, Max_Pool_2d, Convolution_2d, Convolution_2d_Transpose)):
+                return True
+        return False
+    
+    def flattenChecker(self, index):
+        layers = nnet.datadict["model_1"]["layers"]
+        total_layers = len(layers)
+        # Check the next layer, if there is one
+        if index < total_layers:
+            next_layer = layers[index]
+            if not isinstance(next_layer, (Dense, Flatten)):
+                return False
+
+        # If adding at the end or as the only layer, check the previous layer if any
+        if index == 0:
+            # It's the first layer in the list, typically allowed to be a Flatten
+            return True
+        else:
+            # Check if the previous layer is Dense or Flatten
+            prev_layer = layers[index - 1]
+            return isinstance(prev_layer, (Dense, Flatten))
+
+        return True
+
     def saveLayer(self):
+
         # Append to main dictionary the layer type the user wants to add
         length = len(nnet.datadict["model_1"]["layers"])
         
         global index
         
+        insertion_index = index if self.layer_location == "After selected" else len(nnet.datadict["model_1"]["layers"])
+    
+        if self.layer_type == "Flatten":
+            if not self.flattenChecker(insertion_index):
+                QMessageBox.warning(self, "Invalid Layer Placement", "A Flatten layer must only be placed before a Dense or another Flatten layer.")
+                return
+
+        if self.layer_type == "Max Pooling 2d" and self.RNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Max pooling 2d layer bc an RNN layer is in (Simple RNN, LSTM, or GRU)")
+            return
+        
+        if self.layer_type == "Convlution 2d" and self.RNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d layer bc an RNN layer is in (Simple RNN, LSTM, or GRU)")
+            return
+        
+        if self.layer_type == "Convlution 2d Transpose" and self.RNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d layer layer bc an RNN layer is in (Simple RNN, LSTM, or GRU)")
+            return
+        
+        if self.layer_type == "Simple RNN" and self.CNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Simple RNN layer because something besides Dense and Flatten is in.")
+            return
+        
+        if self.layer_type == "LSTM" and self.CNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add LSTM layer because something besides Dense and Flatten is in.")
+            return
+        
+        if self.layer_type == "GRU" and self.CNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add GRU layer because something besides Dense and Flatten is in.")
+            return
+
+
         if(self.layer_location == "Beginning of list"):
             if self.layer_type == "Dense":
                 nnet.datadict["model_1"]["layers"].insert(0,
@@ -2845,6 +2910,20 @@ class ConfigureInputDialog(QDialog):
         select_file_button = QPushButton("Select Directory")
         file_selection_layout.addWidget(select_file_button)
         file_selection_layout.addWidget(self.file_path_label, 1)  # The '1' makes the label expandable
+
+        frame = QFrame()
+        label = QLabel()
+
+        pixmap = QPixmap('directoryformat.jpg')
+        scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        label.setPixmap(scaled_pixmap)
+
+        frame_layout = QVBoxLayout(frame)
+        frame_layout.addWidget(label)
+        layout.addWidget(frame)
+
+        label2 = QLabel("Select root data folder. Data files must be in correct format. \nAny number of participants, results, or trials can be used. \nResult names will be used as data labels.")
+        layout.addWidget(label2)
 
         select_file_button.clicked.connect(self.selectDirectory)
 
