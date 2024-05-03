@@ -24,7 +24,7 @@ class neuralnetModel(QtCore.QAbstractListModel):
             "input_parameters": {
                 "input_shape1" : 0,
                 "input_shape2" : 0,
-                "root_directory" : "./Van250Tot0",
+                "root_directory" : "",
                 "normalized" : False
             },
             "test_parameters": {
@@ -34,11 +34,9 @@ class neuralnetModel(QtCore.QAbstractListModel):
             },
             "model_1" : {
                 "save_model" : True, 
-                "save_file" : "mod1",
+                "save_file" : "",
                 "active": True,
-                "layers": [
-                    Flatten(0), Dense(2, 64), Dense(1, 64, activation="relu"), Flatten(4)
-                ]
+                "layers": []
             }
         }
 
@@ -73,6 +71,7 @@ class TestConfigDialog(QDialog):
         self.epoch_group.setMinimumWidth(50)
         self.epoch_layout = QHBoxLayout(self.epoch_group)
         self.epoch_input = QLineEdit()
+        self.epoch_input.setText(str(nnet.datadict["test_parameters"]["epochs"]))
         self.epoch_input.setMaximumWidth(50)
         self.epoch_input.setMinimumWidth(50)
 
@@ -82,11 +81,26 @@ class TestConfigDialog(QDialog):
 
 
         self.epoch_layout.addWidget(self.epoch_input)
+
         layout.addWidget(self.epoch_group)
 
         #Shuffling
         self.checkbox = QCheckBox("Shuffle")
         layout.addWidget(self.checkbox)
+
+        if nnet.datadict["test_parameters"]["shuffle"]:
+            self.checkbox.setChecked(True)
+
+        self.checkbox2 = QCheckBox("Save File")
+        layout.addWidget(self.checkbox2)
+        if nnet.datadict["model_1"]["save_model"]:
+            self.checkbox2.setChecked(True)
+
+        self.label2 = QLabel('File Name')
+        self.model_input = QLineEdit()
+        self.model_input.setText(nnet.datadict["model_1"]["save_file"])
+        layout.addWidget(self.label2)
+        layout.addWidget(self.model_input)
 
         #slider for testing split
         self.label = QLabel('Data Testing Split: 20%')
@@ -95,7 +109,7 @@ class TestConfigDialog(QDialog):
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setMinimum(20)
         self.slider.setMaximum(80)
-        self.slider.setValue(20)
+        self.slider.setValue(int(nnet.datadict["test_parameters"]["test_split"]*100))
         self.slider.valueChanged.connect(self.onValueChanged)
         self.slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.slider.setTickInterval(5)
@@ -118,9 +132,11 @@ class TestConfigDialog(QDialog):
         nnet.datadict["test_parameters"]["test_split"] = self.slider.value() / 100
         nnet.datadict["test_parameters"]["epochs"] = int(float(self.epoch_input.text()))
         nnet.datadict["test_parameters"]["shuffle"] = self.checkbox.isChecked()
+        nnet.datadict["model_1"]["save_model"] = self.checkbox2.isChecked()
+        nnet.datadict["model_1"]["save_file"] = str(self.model_input.text())
         
         self.accept()
-
+        
 class ConfigureAddLayerDialog(QDialog):
     def __init__(self, layer_type, layer_location, parent=None):
         super().__init__(parent)
@@ -2774,14 +2790,18 @@ class ConfigureInputDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configure Input")
-        self.setMinimumSize(400,250)
+
         self.config = []
 
         layout = QVBoxLayout(self)
 
         # File selection components
         file_selection_layout = QHBoxLayout()
-        self.file_path_label = QLabel("No directory selected")
+        if nnet.datadict["input_parameters"]["root_directory"] == "":
+
+            self.file_path_label = QLabel("No Directory Selected")
+        else:
+            self.file_path_label = QLabel(nnet.datadict["input_parameters"]["root_directory"])
         self.file_path_label.setWordWrap(True)  # Allow label to wrap if path is too long
         select_file_button = QPushButton("Select Directory")
         file_selection_layout.addWidget(select_file_button)
@@ -2796,6 +2816,7 @@ class ConfigureInputDialog(QDialog):
         input_shape_layout = QHBoxLayout(input_shape_group)
 
         width_input = QLineEdit()
+     
         height_input = QLineEdit()
 
         validator = QRegularExpressionValidator(QRegularExpression("[0-9]{0,4}"))
@@ -2806,8 +2827,10 @@ class ConfigureInputDialog(QDialog):
         self.config.append(height_input)
 
         input_shape_layout.addWidget(width_input)
+        width_input.setText(str(nnet.datadict["input_parameters"]["input_shape1"]))
         input_shape_layout.addWidget(QLabel("X"))
         input_shape_layout.addWidget(height_input)
+        height_input.setText(str(nnet.datadict["input_parameters"]["input_shape1"]))
 
         layout.addWidget(input_shape_group)
 

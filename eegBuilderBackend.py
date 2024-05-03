@@ -187,7 +187,7 @@ def process_model(models):
     loss, accuracy = train_test_model(data, labels, model, models)
 
     # Creating result summary
-    with open("result.txt", "w+") as result:
+    with open("model_summary_" + time.strftime("%Y-%m-%d_%H:%M") + ".txt", "w+") as result:
         
         result.write("---Labels---\n\n")
         result.write("(Label: value)\n")
