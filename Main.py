@@ -136,7 +136,7 @@ class TestConfigDialog(QDialog):
         nnet.datadict["model_1"]["save_file"] = str(self.model_input.text())
         
         self.accept()
-        
+
 class ConfigureAddLayerDialog(QDialog):
     def __init__(self, layer_type, layer_location, parent=None):
         super().__init__(parent)
@@ -377,11 +377,15 @@ class ConfigureAddLayerDialog(QDialog):
 
     def configureMaxPooling2dLayer(self, layout):
 
+        max_pool_desc_label = QLabel("Max pooling 2d - Reduces input size by taking the maximum of a group of inputs in a 2D space and storing them as a single input")
+        layout.addWidget(max_pool_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
 
-        pool_size_label = QLabel("Pool Size: (x, y)")
+        pool_size_label = QLabel("\u24D8 Pool Size: (x, y)")
+        pool_size_label.setToolTip("Tuple of 2 integers, factors by which to downscale (dim1, dim2)")
         layout.addWidget(pool_size_label)
 
         #add text box
@@ -409,7 +413,8 @@ class ConfigureAddLayerDialog(QDialog):
         mp2d_poolsize.append(mp2d_poolsize_y.text())
 
 
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integers. Distance filter moves in x and y directions")
         layout.addWidget(strides_label)
 
         #add text box
@@ -437,7 +442,8 @@ class ConfigureAddLayerDialog(QDialog):
         mp2d_strides.append(mp2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         mp2d_padding = QComboBox()
         mp2d_padding.addItems(["valid", "same"])
@@ -450,11 +456,15 @@ class ConfigureAddLayerDialog(QDialog):
 
     def configureConvolution2dLayer(self, layout):
 
+        convolution_2d_desc_label = QLabel("Convolutional 2d - Passes filter over 2D input, creating smaller 2D output that highlights features")
+        layout.addWidget(convolution_2d_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
         #filters
-        filters_label = QLabel("Filters:")
+        filters_label = QLabel("\u24D8 Filters:")
+        filters_label.setToolTip("Integer, the dimension of the output space (the number of filters in the convolution)")
         layout.addWidget(filters_label)
 
         #add text box
@@ -467,7 +477,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_filter)
 
         #kernel size
-        kernelsize_label = QLabel("Kernel Size: (x, y)")
+        kernelsize_label = QLabel("\u24D8 Kernel Size: (x, y)")
+        kernelsize_label.setToolTip("Tuple of 2 integer, specifying the size of the convolution window")
         layout.addWidget(kernelsize_label)
 
 
@@ -491,7 +502,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_kernelsize_y)
 
         #strides
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integer, specifying the stride length of the convolution. Note - strides > 1 is incompatible with dilation rate > 1")
         layout.addWidget(strides_label)
 
 
@@ -520,7 +532,8 @@ class ConfigureAddLayerDialog(QDialog):
         c2d_strides.append(c2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         c2d_padding = QComboBox()
         c2d_padding.addItems(["valid", "same"])
@@ -529,7 +542,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dilation Rate: (x, y)")
+        dialationrate_label = QLabel("\u24D8 Dilation Rate: (x, y)")
+        dialationrate_label.setToolTip("Tuple of 2 integers, specifying the dilation rate to use for dilated convolution")
         layout.addWidget(dialationrate_label)
 
         #add text box``
@@ -552,7 +566,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_dialationrate_y)
 
         #groups
-        groups_label = QLabel("Groups:")
+        groups_label = QLabel("\u24D8 Groups:")
+        groups_label.setToolTip("A positive int specifying the number of groups in which the int is split along the channel axis")
         layout.addWidget(groups_label)
 
         #add text box
@@ -566,7 +581,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_groups)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function. If None, no activation is applied")
         layout.addWidget(activation_label)
         c2d_activation = QComboBox()
         c2d_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -575,7 +591,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Bool, if True, bias will be added to the output.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -584,7 +601,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the convolution kernel")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
@@ -593,7 +611,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -1737,11 +1756,15 @@ class EditLayerDialog(QDialog):
 
     def configureMaxPooling2dLayer(self, layout):
 
+        max_pool_desc_label = QLabel("Max pooling 2d - Reduces input size by taking the maximum of a group of inputs in a 2D space and storing them as a single input")
+        layout.addWidget(max_pool_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
 
-        pool_size_label = QLabel("Pool Size: (x, y)")
+        pool_size_label = QLabel("\u24D8 Pool Size: (x, y)")
+        pool_size_label.setToolTip("Tuple of 2 integers, factors by which to downscale (dim1, dim2)")
         layout.addWidget(pool_size_label)
 
         #add text box
@@ -1771,7 +1794,8 @@ class EditLayerDialog(QDialog):
         mp2d_poolsize.append(mp2d_poolsize_y.text())
 
 
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integers. Distance filter moves in x and y directions")
         layout.addWidget(strides_label)
 
         #add text box
@@ -1803,7 +1827,8 @@ class EditLayerDialog(QDialog):
         mp2d_strides.append(mp2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         mp2d_padding = QComboBox()
         mp2d_padding.addItems(["valid", "same"])
@@ -1821,11 +1846,15 @@ class EditLayerDialog(QDialog):
 
     def configureConvolution2dLayer(self, layout):
 
+        convolution_2d_desc_label = QLabel("Convolutional 2d - Passes filter over 2D input, creating smaller 2D output that highlights features")
+        layout.addWidget(convolution_2d_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
         #filters
-        filters_label = QLabel("Filters:")
+        filters_label = QLabel("\u24D8 Filters:")
+        filters_label.setToolTip("Integer, the dimension of the output space (the number of filters in the convolution)")
         layout.addWidget(filters_label)
 
         #add text box
@@ -1841,7 +1870,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_filter)
 
         #kernel size
-        kernelsize_label = QLabel("Kernel Size: (x, y)")
+        kernelsize_label = QLabel("\u24D8 Kernel Size: (x, y)")
+        kernelsize_label.setToolTip("Tuple of 2 integer, specifying the size of the convolution window")
         layout.addWidget(kernelsize_label)
 
 
@@ -1869,7 +1899,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_kernelsize_y)
 
         #strides
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integer, specifying the stride length of the convolution. Note - strides > 1 is incompatible with dilation rate > 1")
         layout.addWidget(strides_label)
 
 
@@ -1900,7 +1931,8 @@ class EditLayerDialog(QDialog):
         c2d_strides.append(c2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         c2d_padding = QComboBox()
         c2d_padding.addItems(["valid", "same"])
@@ -1913,7 +1945,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dilation Rate: (x, y)")
+        dialationrate_label = QLabel("\u24D8 Dilation Rate: (x, y)")
+        dialationrate_label.setToolTip("Tuple of 2 integers, specifying the dilation rate to use for dilated convolution")
         layout.addWidget(dialationrate_label)
 
         #add text box
@@ -1938,7 +1971,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_dialationrate_y)
 
         #groups
-        groups_label = QLabel("Groups:")
+        groups_label = QLabel("\u24D8 Groups:")
+        groups_label.setToolTip("A positive int specifying the number of groups in which the int is split along the channel axis")
         layout.addWidget(groups_label)
 
         #add text box
@@ -1954,7 +1988,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_groups)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function. If None, no activation is applied")
         layout.addWidget(activation_label)
         c2d_activation = QComboBox()
         c2d_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -1967,7 +2002,8 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Bool, if True, bias will be added to the output.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -1981,7 +2017,8 @@ class EditLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the convolution kernel")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
@@ -1994,7 +2031,8 @@ class EditLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2016,7 +2054,8 @@ class EditLayerDialog(QDialog):
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
         #filters
-        filters_label = QLabel("Filters:")
+        filters_label = QLabel("\u24D8 Filters:")
+        filters_label.setToolTip("Integer, the dimension of the output space (the number of filters in the convolution)")
         layout.addWidget(filters_label)
 
         #add text box
@@ -2630,7 +2669,7 @@ class EditLayerDialog(QDialog):
                     self.config[4].currentText()
                     )
                 )
-        elif self.layer_type == "max_pooling_2d":
+        elif self.layer_type == "max_pool_2d":
             nnet.datadict["model_1"]["layers"].insert(index,
                 Max_Pool_2d(
                     length, 
@@ -2834,11 +2873,6 @@ class ConfigureInputDialog(QDialog):
 
         layout.addWidget(input_shape_group)
 
-        normalize = QCheckBox("Normalize")
-        layout.addWidget(normalize)
-
-        self.config.append(normalize)
-
             # Dialog buttons
         buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         layout.addWidget(buttons)
@@ -2857,7 +2891,6 @@ class ConfigureInputDialog(QDialog):
         # Saves the Input shape size and normalization to main dictionary.
         nnet.datadict["input_parameters"]["input_shape1"] = self.config[0].text() if self.config[0].text() != "" else nnet.datadict["input_parameters"]["input_shape1"]
         nnet.datadict["input_parameters"]["input_shape2"] = self.config[1].text() if self.config[1].text() != "" else nnet.datadict["input_parameters"]["input_shape2"]
-        nnet.datadict["input_parameters"]["normalized"] = self.config[2].isChecked()
 
         self.accept()
 

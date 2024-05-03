@@ -187,8 +187,11 @@ def process_model(models):
     loss, accuracy = train_test_model(data, labels, model, models)
 
     # Creating result summary
-    with open("model_summary_" + time.strftime("%Y-%m-%d_%H:%M") + ".txt", "w+") as result:
-        
+    time_frame = time.strftime("%Y-%m-%d_%H_%M")
+
+    filename = "model_summary_" + str(time_frame) + ".txt"
+    with open(filename, "w") as result:
+    #with open("model_summary_" + ".txt", "w+") as result:
         result.write("---Labels---\n\n")
         result.write("(Label: value)\n")
         for key in labelDict:
@@ -198,7 +201,7 @@ def process_model(models):
             result.write("\n")
 
         result.write("\n---Model Summary---\n\n")
-        
+
         with redirect_stdout(result):
             model.summary()
 
