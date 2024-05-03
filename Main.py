@@ -4,8 +4,17 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6 import QtCore
+from eegBuilderBackend import *
+
 
 from layerClasses import *
+
+# Defaults for 
+defaults = {
+    "Standard Neural Network": [Flatten(0),Dense(0, 64), Dense(0,64,"relu")],
+    "Convolutional NN": [Convolution_2d(0,filters=16, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=32, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=64, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)), Flatten(0), Dense(0,64), Dense(0,32) ],
+    "Recurrent NN": [SimpleRNN(0,16)]
+}
 
 # Dictionary that hold configuration values and will eventually be passed to the backend
 class neuralnetModel(QtCore.QAbstractListModel):
@@ -107,7 +116,7 @@ class TestConfigDialog(QDialog):
     def saveConfig(self):
 
         nnet.datadict["test_parameters"]["test_split"] = self.slider.value() / 100
-        nnet.datadict["test_parameters"]["epochs"] = float(self.epoch_input.text())
+        nnet.datadict["test_parameters"]["epochs"] = int(float(self.epoch_input.text()))
         nnet.datadict["test_parameters"]["shuffle"] = self.checkbox.isChecked()
         
         self.accept()
@@ -157,10 +166,14 @@ class ConfigureAddLayerDialog(QDialog):
 
     def configureDenseLayer(self, layout):
 
+        dense_desc_label = QLabel("Dense - 1D layer of fully connected neurons")
+        layout.addWidget(dense_desc_label)
+        
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
 
         #add text box
         dense_units = QLineEdit()
@@ -173,7 +186,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(dense_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("What activation function to use. If you picked None, no activation is applied")
         layout.addWidget(activation_label)
         dense_activation = QComboBox()
         dense_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -182,7 +196,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(dense_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, determines whether the layer uses a bias vector")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -191,7 +206,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
@@ -200,7 +216,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
@@ -212,6 +229,9 @@ class ConfigureAddLayerDialog(QDialog):
         pass
 
     def configureFlattenLayer(self, layout):
+
+        flatten_desc_label = QLabel("Flatten - Transforms 2d input into 1d layer")
+        layout.addWidget(flatten_desc_label)
 
         flatten_label = QLabel("Flatten Layer (no extra parameters needed)")
         layout.addWidget(flatten_label)
@@ -225,7 +245,8 @@ class ConfigureAddLayerDialog(QDialog):
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
 
-        padding_label = QLabel("Padding: (x, y)")
+        padding_label = QLabel("\u24D8 Padding: (x, y)")
+        padding_label.setToolTip("Tuple of 2 ints indicating how many rows/columns to add to input.")
         layout.addWidget(padding_label)
 
         #add text box
@@ -261,11 +282,14 @@ class ConfigureAddLayerDialog(QDialog):
 
     def configureAveragePooling2dLayer(self, layout):
 
+        avg_pool_desc_label = QLabel("Average Pooling 2D - Reduces input size by averaging a group of inputs in a 2D space and storing them as a single input")
+        layout.addWidget(avg_pool_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-
-        pool_size_label = QLabel("Pool Size: (x, y)")
+        pool_size_label = QLabel("\u24D8 Pool Size: (x, y)")
+        pool_size_label.setToolTip("Tuple of 2 integers, factors by which to downscale (dim1, dim2)")
         layout.addWidget(pool_size_label)
 
         #add text box
@@ -293,7 +317,8 @@ class ConfigureAddLayerDialog(QDialog):
         ap2d_poolsize.append(ap2d_poolsize_y.text())
 
 
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integers. Distance filter moves in x and y directions")
         layout.addWidget(strides_label)
 
         #add text box
@@ -321,7 +346,8 @@ class ConfigureAddLayerDialog(QDialog):
         ap2d_strides.append(ap2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         ap2d_padding = QComboBox()
         ap2d_padding.addItems(["valid", "same"])
@@ -487,7 +513,7 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2d_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dialation Rate: (x, y)")
+        dialationrate_label = QLabel("Dilation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
 
         #add text box``
@@ -495,7 +521,7 @@ class ConfigureAddLayerDialog(QDialog):
 
         c2d_dialationrate_x = QLineEdit()
         c2d_dialationrate_x.setValidator(validator)
-        c2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
+        c2d_dialationrate_x.setPlaceholderText("Dilation Rate x value")
         c2d_dialationrate_x.setText("1")
         layout.addWidget(c2d_dialationrate_x)
 
@@ -503,7 +529,7 @@ class ConfigureAddLayerDialog(QDialog):
 
         c2d_dialationrate_y = QLineEdit()
         c2d_dialationrate_y.setValidator(validator)
-        c2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
+        c2d_dialationrate_y.setPlaceholderText("Dilation Rate y value")
         c2d_dialationrate_y.setText("1")
         layout.addWidget(c2d_dialationrate_y)
 
@@ -545,7 +571,7 @@ class ConfigureAddLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -581,7 +607,7 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2dt_filter)
 
         #kernel size
-        kernelsize_label = QLabel("Kernel Size: (x, y)")
+        kernelsize_label = QLabel("Kernel Size:")
         layout.addWidget(kernelsize_label)
 
 
@@ -590,22 +616,14 @@ class ConfigureAddLayerDialog(QDialog):
 
         c2dt_kernelsize_x = QLineEdit()
         c2dt_kernelsize_x.setValidator(validator)
-        c2dt_kernelsize_x.setPlaceholderText("Kernel Size x value")
+        c2dt_kernelsize_x.setPlaceholderText("Kernel Size value")
         c2dt_kernelsize_x.setStyleSheet("border-style: outset;border-width: 2px;")
         layout.addWidget(c2dt_kernelsize_x)
 
         self.config.append(c2dt_kernelsize_x)
 
-        c2dt_kernelsize_y = QLineEdit()
-        c2dt_kernelsize_y.setValidator(validator)
-        c2dt_kernelsize_y.setPlaceholderText("Kernel Size y value")
-        c2dt_kernelsize_y.setStyleSheet("border-style: outset;border-width: 2px;")
-        layout.addWidget(c2dt_kernelsize_y)
-
-        self.config.append(c2dt_kernelsize_y)
-
         #strides
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("Strides:")
         layout.addWidget(strides_label)
 
 
@@ -614,24 +632,15 @@ class ConfigureAddLayerDialog(QDialog):
 
         c2dt_strides_x = QLineEdit()
         c2dt_strides_x.setValidator(validator)
-        c2dt_strides_x.setPlaceholderText("Strides x value")
+        c2dt_strides_x.setPlaceholderText("Strides value")
         c2dt_strides_x.setText("1")
         layout.addWidget(c2dt_strides_x)
 
         self.config.append(c2dt_strides_x)
 
-        c2dt_strides_y = QLineEdit()
-        c2dt_strides_y.setValidator(validator)
-        c2dt_strides_y.setPlaceholderText("Strides y value")
-        c2dt_strides_y.setText("1")
-        layout.addWidget(c2dt_strides_y)
-
-        self.config.append(c2dt_strides_y)
-
         #PROBABLY DOESN'T WORK RIGHT
         c2dt_strides = []
         c2dt_strides.append(c2dt_strides_x.text())
-        c2dt_strides.append(c2dt_strides_y.text())
 
         #padding dropdown
         padding_label = QLabel("Padding:")
@@ -643,7 +652,7 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(c2dt_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dialation Rate: (x, y)")
+        dialationrate_label = QLabel("Dilation Rate:")
         layout.addWidget(dialationrate_label)
 
         #add text box
@@ -651,19 +660,11 @@ class ConfigureAddLayerDialog(QDialog):
 
         c2dt_dialationrate_x = QLineEdit()
         c2dt_dialationrate_x.setValidator(validator)
-        c2dt_dialationrate_x.setPlaceholderText("Dialation Rate x value")
+        c2dt_dialationrate_x.setPlaceholderText("Dilation Rate value")
         c2dt_dialationrate_x.setText("1")
         layout.addWidget(c2dt_dialationrate_x)
 
         self.config.append(c2dt_dialationrate_x)
-
-        c2dt_dialationrate_y = QLineEdit()
-        c2dt_dialationrate_y.setValidator(validator)
-        c2dt_dialationrate_y.setPlaceholderText("Dialation Rate y value")
-        c2dt_dialationrate_y.setText("1")
-        layout.addWidget(c2dt_dialationrate_y)
-
-        self.config.append(c2dt_dialationrate_y)
 
         #groups
         groups_label = QLabel("Groups:")
@@ -701,7 +702,7 @@ class ConfigureAddLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -729,7 +730,8 @@ class ConfigureAddLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -744,7 +746,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         srnn_activation = QComboBox()
-        srnn_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        srnn_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
         layout.addWidget(srnn_activation)
 
         self.config.append(srnn_activation)
@@ -762,7 +764,7 @@ class ConfigureAddLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -771,7 +773,7 @@ class ConfigureAddLayerDialog(QDialog):
         r_initializer_label = QLabel("Recurrent Initializer:")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
-        recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(recurrent_initializer)
 
         self.config.append(recurrent_initializer)
@@ -811,18 +813,6 @@ class ConfigureAddLayerDialog(QDialog):
 
         self.config.append(srnn_recurrent_dropout)
 
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        srnn_seed = QLineEdit()
-        srnn_seed.setPlaceholderText("Seed")
-        srnn_seed.setValidator(validator)
-        layout.addWidget(srnn_seed)
-
-        self.config.append(srnn_seed)
-
         # Add widgets specific to configuring layer
         pass
 
@@ -834,7 +824,8 @@ class ConfigureAddLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -849,7 +840,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         lstm_activation = QComboBox()
-        lstm_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        lstm_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
         layout.addWidget(lstm_activation)
 
         self.config.append(lstm_activation)
@@ -858,7 +849,7 @@ class ConfigureAddLayerDialog(QDialog):
         recurrent_activation_label = QLabel("Recurrent Activation Type:")
         layout.addWidget(recurrent_activation_label)
         lstm_recurrent_activation = QComboBox()
-        lstm_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        lstm_recurrent_activation.addItems(["sigmoid", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(lstm_recurrent_activation)
 
         self.config.append(lstm_recurrent_activation)
@@ -876,7 +867,7 @@ class ConfigureAddLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -885,7 +876,7 @@ class ConfigureAddLayerDialog(QDialog):
         r_initializer_label = QLabel("Recurrent Initializer:")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
-        recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(recurrent_initializer)
 
         self.config.append(recurrent_initializer)
@@ -935,18 +926,6 @@ class ConfigureAddLayerDialog(QDialog):
 
         self.config.append(lstm_recurrent_dropout)
 
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        lstm_seed = QLineEdit()
-        lstm_seed.setPlaceholderText("Seed")
-        lstm_seed.setValidator(validator)
-        layout.addWidget(lstm_seed)
-
-        self.config.append(lstm_seed)
-
         # Add widgets specific to configuring layer
         pass
 
@@ -958,7 +937,8 @@ class ConfigureAddLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -973,7 +953,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         gru_activation = QComboBox()
-        gru_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        gru_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
         layout.addWidget(gru_activation)
 
         self.config.append(gru_activation)
@@ -982,7 +962,7 @@ class ConfigureAddLayerDialog(QDialog):
         recurrent_activation_label = QLabel("Recurrent Activation Type:")
         layout.addWidget(recurrent_activation_label)
         gru_recurrent_activation = QComboBox()
-        gru_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        gru_recurrent_activation.addItems(["sigmoid", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(gru_recurrent_activation)
 
         self.config.append(gru_recurrent_activation)
@@ -1000,7 +980,7 @@ class ConfigureAddLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -1009,7 +989,7 @@ class ConfigureAddLayerDialog(QDialog):
         r_initializer_label = QLabel("Recurrent Initializer:")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
-        recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
         layout.addWidget(recurrent_initializer)
 
         self.config.append(recurrent_initializer)
@@ -1022,11 +1002,6 @@ class ConfigureAddLayerDialog(QDialog):
         layout.addWidget(bias_initializer)
 
         self.config.append(bias_initializer)
-
-        gru_unit_forget_bias = QCheckBox("Unit Forget Bias")
-        layout.addWidget(gru_unit_forget_bias)
-
-        self.config.append(gru_unit_forget_bias)
 
         #dropout
         dropout_label = QLabel("Dropout:")
@@ -1053,18 +1028,6 @@ class ConfigureAddLayerDialog(QDialog):
         layout.addWidget(gru_recurrent_dropout)
 
         self.config.append(gru_recurrent_dropout)
-
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        gru_seed = QLineEdit()
-        gru_seed.setPlaceholderText("Seed")
-        gru_seed.setValidator(validator)
-        layout.addWidget(gru_seed)
-
-        self.config.append(gru_seed)
 
         #reset after dropdown
         reset_after_label = QLabel("Reset After:")
@@ -1148,15 +1111,15 @@ class ConfigureAddLayerDialog(QDialog):
                     Convolution_2d_Transpose(
                         length, 
                         int(float(self.config[0].text())), 
-                        (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
-                        (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
-                        self.config[5].currentText(), 
-                        (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
-                        int(float(self.config[8].text())), 
-                        self.config[9].currentText(), 
-                        self.config[10].currentText(), 
-                        self.config[11].currentText(), 
-                        self.config[12].currentText()
+                        (int(float(self.config[1].text()))), 
+                        (int(float(self.config[2].text()))), 
+                        self.config[3].currentText(), 
+                        (int(float(self.config[4].text()))), 
+                        int(float(self.config[5].text())), 
+                        self.config[6].currentText(), 
+                        self.config[7].currentText(), 
+                        self.config[8].currentText(), 
+                        self.config[9].currentText()
                         )
                     )
             elif self.layer_type == "Simple RNN":
@@ -1170,8 +1133,7 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[4].currentText(), 
                         self.config[5].currentText(), 
                         float(self.config[6].text()), 
-                        float(self.config[7].text()), 
-                        int(float(self.config[8].text()))
+                        float(self.config[7].text())
                         )
                     )
             elif self.layer_type == "LSTM":
@@ -1187,8 +1149,7 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[6].currentText(), 
                         self.config[7].currentText(), 
                         float(self.config[8].text()), 
-                        float(self.config[9].text()), 
-                        int(float(self.config[10].text()))
+                        float(self.config[9].text())
                         )
                     )
             elif self.layer_type == "GRU":
@@ -1202,11 +1163,9 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[4].currentText(), 
                         self.config[5].currentText(), 
                         self.config[6].currentText(), 
-                        self.config[7].isChecked(), 
+                        float(self.config[7].text()), 
                         float(self.config[8].text()), 
-                        float(self.config[9].text()), 
-                        int(float(self.config[10].text())), 
-                        self.config[11].currentText()
+                        self.config[9].currentText()
                         )
                     )
         elif(self.layer_location == "End of list" or index == -1):
@@ -1273,15 +1232,15 @@ class ConfigureAddLayerDialog(QDialog):
                     Convolution_2d_Transpose(
                         length, 
                         int(float(self.config[0].text())), 
-                        (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
-                        (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
-                        self.config[5].currentText(), 
-                        (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
-                        int(float(self.config[8].text())), 
-                        self.config[9].currentText(), 
-                        self.config[10].currentText(), 
-                        self.config[11].currentText(), 
-                        self.config[12].currentText()
+                        (int(float(self.config[1].text()))), 
+                        (int(float(self.config[2].text()))), 
+                        self.config[3].currentText(), 
+                        (int(float(self.config[4].text()))), 
+                        int(float(self.config[5].text())), 
+                        self.config[6].currentText(), 
+                        self.config[7].currentText(), 
+                        self.config[8].currentText(), 
+                        self.config[9].currentText()
                         )
                     )
             elif self.layer_type == "Simple RNN":
@@ -1295,8 +1254,7 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[4].currentText(), 
                         self.config[5].currentText(), 
                         float(self.config[6].text()), 
-                        float(self.config[7].text()), 
-                        int(float(self.config[8].text()))
+                        float(self.config[7].text())
                         )
                     )
             elif self.layer_type == "LSTM":
@@ -1312,8 +1270,7 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[6].currentText(), 
                         self.config[7].currentText(), 
                         float(self.config[8].text()), 
-                        float(self.config[9].text()), 
-                        int(float(self.config[10].text()))
+                        float(self.config[9].text())
                         )
                     )
             elif self.layer_type == "GRU":
@@ -1327,13 +1284,11 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[4].currentText(), 
                         self.config[5].currentText(), 
                         self.config[6].currentText(), 
-                        self.config[7].isChecked(), 
+                        float(self.config[7].text()), 
                         float(self.config[8].text()), 
-                        float(self.config[9].text()), 
-                        int(float(self.config[10].text())), 
-                        self.config[11].currentText()
+                        self.config[9].currentText()
                         )
-                    )      
+                    )     
         elif(self.layer_location == "After selected"):
             if self.layer_type == "Dense":
                 nnet.datadict["model_1"]["layers"].insert(index + 1,
@@ -1398,15 +1353,15 @@ class ConfigureAddLayerDialog(QDialog):
                     Convolution_2d_Transpose(
                         length, 
                         int(float(self.config[0].text())), 
-                        (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
-                        (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
-                        self.config[5].currentText(), 
-                        (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
-                        int(float(self.config[8].text())), 
-                        self.config[9].currentText(), 
-                        self.config[10].currentText(), 
-                        self.config[11].currentText(), 
-                        self.config[12].currentText()
+                        (int(float(self.config[1].text()))), 
+                        (int(float(self.config[2].text()))), 
+                        self.config[3].currentText(), 
+                        (int(float(self.config[4].text()))), 
+                        int(float(self.config[5].text())), 
+                        self.config[6].currentText(), 
+                        self.config[7].currentText(), 
+                        self.config[8].currentText(), 
+                        self.config[9].currentText()
                         )
                     )
 
@@ -1453,11 +1408,10 @@ class ConfigureAddLayerDialog(QDialog):
                         self.config[4].currentText(), 
                         self.config[5].currentText(), 
                         self.config[6].currentText(), 
-                        self.config[7].isChecked(), 
+                        float(self.config[7].text()), 
                         float(self.config[8].text()), 
-                        float(self.config[9].text()), 
-                        int(float(self.config[10].text())), 
-                        self.config[11].currentText()
+                        int(float(self.config[9].text())), 
+                        self.config[10].currentText()
                         )
                     )
         
@@ -1471,14 +1425,16 @@ class AddLayerDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
-        self.label = QLabel("Layer Type:")
+        self.label = QLabel("\u24D8 Layer Type:")
+        self.label.setToolTip("Type of layer you would like to add")
         layout.addWidget(self.label)
 
         self.comboBox = QComboBox()
-        self.comboBox.addItems(["Dense", "Flatten", "Zero Padding 2d", "Average Pooling 2d", "Max Pooling 2d", "Convolution 2d", "Convolution 2d Transpose", "Simple RNN", "LSTM", "GRU"])
+        self.comboBox.addItems(["Dense", "Flatten", "Zero Padding 2d", "Average Pooling 2d", "Max Pooling 2d", "Convolution 2d", "Simple RNN", "LSTM", "GRU"])
         layout.addWidget(self.comboBox)
 
-        self.label2 = QLabel("Layer Location:")
+        self.label2 = QLabel("\u24D8 Layer Location:")
+        self.label2.setToolTip("Where do you want to insert this layer")
         layout.addWidget(self.label2)
 
         self.comboBox2 = QComboBox()
@@ -1545,15 +1501,19 @@ class EditLayerDialog(QDialog):
         buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
         layout.addWidget(buttons)
 
-        #buttons.accepted.connect(self.saveLayer)    # Saving configuration function
+        buttons.accepted.connect(self.saveLayer)
         buttons.rejected.connect(self.reject)
 
     def configureDenseLayer(self, layout):
 
+        dense_desc_label = QLabel("Dense - 1D layer of fully connected neurons")
+        layout.addWidget(dense_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
 
         #add text box
         dense_units = QLineEdit()
@@ -1567,7 +1527,8 @@ class EditLayerDialog(QDialog):
         self.config.append(dense_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("What activation function to use. If you picked None, no activation is applied")
         layout.addWidget(activation_label)
         dense_activation = QComboBox()
         dense_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -1577,7 +1538,8 @@ class EditLayerDialog(QDialog):
         self.config.append(dense_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, determines whether the layer uses a bias vector")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -1590,7 +1552,8 @@ class EditLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
@@ -1600,7 +1563,8 @@ class EditLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
@@ -1614,6 +1578,9 @@ class EditLayerDialog(QDialog):
 
     def configureFlattenLayer(self, layout):
 
+        flatten_desc_label = QLabel("Flatten - Transforms 2d input into 1d layer")
+        layout.addWidget(flatten_desc_label)
+
         flatten_label = QLabel("Flatten Layer (no extra parameters needed)")
         layout.addWidget(flatten_label)
 
@@ -1626,7 +1593,8 @@ class EditLayerDialog(QDialog):
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
 
-        padding_label = QLabel("Padding: (x, y)")
+        padding_label = QLabel("\u24D8 Padding: (x, y)")
+        padding_label.setToolTip("Tuple of 2 ints indicating how many rows/columns to add to input.")
         layout.addWidget(padding_label)
 
         #add text box
@@ -1662,11 +1630,15 @@ class EditLayerDialog(QDialog):
 
     def configureAveragePooling2dLayer(self, layout):
 
+        avg_pool_desc_label = QLabel("Average Pooling 2D - Reduces input size by averaging a group of inputs in a 2D space and storing them as a single input")
+        layout.addWidget(avg_pool_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
 
-        pool_size_label = QLabel("Pool Size: (x, y)")
+        pool_size_label = QLabel("\u24D8 Pool Size: (x, y)")
+        pool_size_label.setToolTip("Tuple of 2 integers, factors by which to downscale (dim1, dim2)")
         layout.addWidget(pool_size_label)
 
         #add text box
@@ -1696,7 +1668,8 @@ class EditLayerDialog(QDialog):
         ap2d_poolsize.append(ap2d_poolsize_y.text())
 
 
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("\u24D8 Strides: (x, y)")
+        strides_label.setToolTip("Tuple of 2 integers. Distance filter moves in x and y directions")
         layout.addWidget(strides_label)
 
         #add text box
@@ -1728,7 +1701,8 @@ class EditLayerDialog(QDialog):
         ap2d_strides.append(ap2d_strides_y.text())
 
         #padding dropdown
-        padding_label = QLabel("Padding:")
+        padding_label = QLabel("\u24D8 Padding:")
+        padding_label.setToolTip("Either valid or same (case-insensitive), valid means no padding. Same results in padding evenly to the left/right or up/down of the input such that output has the same heigh/width dimension as the input")
         layout.addWidget(padding_label)
         ap2d_padding = QComboBox()
         ap2d_padding.addItems(["valid", "same"])
@@ -1923,7 +1897,7 @@ class EditLayerDialog(QDialog):
         self.config.append(c2d_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dialation Rate: (x, y)")
+        dialationrate_label = QLabel("Dilation Rate: (x, y)")
         layout.addWidget(dialationrate_label)
 
         #add text box
@@ -1931,14 +1905,14 @@ class EditLayerDialog(QDialog):
 
         c2d_dialationrate_x = QLineEdit()
         c2d_dialationrate_x.setValidator(validator)
-        c2d_dialationrate_x.setPlaceholderText("Dialation Rate x value")
+        c2d_dialationrate_x.setPlaceholderText("Dilation Rate x value")
         layout.addWidget(c2d_dialationrate_x)
 
         self.config.append(c2d_dialationrate_x)
 
         c2d_dialationrate_y = QLineEdit()
         c2d_dialationrate_y.setValidator(validator)
-        c2d_dialationrate_y.setPlaceholderText("Dialation Rate y value")
+        c2d_dialationrate_y.setPlaceholderText("Dilation Rate y value")
         layout.addWidget(c2d_dialationrate_y)
 
         if self.layer.dialation_rate:
@@ -1994,7 +1968,7 @@ class EditLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         if self.layer.kernel_initializer:
             index = kernel_initializer.findText(self.layer.kernel_initializer, QtCore.Qt.MatchFixedString)
         if index >= 0:
@@ -2041,7 +2015,7 @@ class EditLayerDialog(QDialog):
         self.config.append(c2dt_filter)
 
         #kernel size
-        kernelsize_label = QLabel("Kernel Size: (x, y)")
+        kernelsize_label = QLabel("Kernel Size:")
 
         layout.addWidget(kernelsize_label)
 
@@ -2051,27 +2025,14 @@ class EditLayerDialog(QDialog):
 
         c2dt_kernelsize_x = QLineEdit()
         c2dt_kernelsize_x.setValidator(validator)
-        c2dt_kernelsize_x.setPlaceholderText("Kernel Size x value")
+        c2dt_kernelsize_x.setPlaceholderText("Kernel Size value")
         c2dt_kernelsize_x.setStyleSheet("border-style: outset;border-width: 2px;")
         layout.addWidget(c2dt_kernelsize_x)
 
         self.config.append(c2dt_kernelsize_x)
 
-        c2dt_kernelsize_y = QLineEdit()
-        c2dt_kernelsize_y.setValidator(validator)
-        c2dt_kernelsize_y.setPlaceholderText("Kernel Size y value")
-        c2dt_kernelsize_y.setStyleSheet("border-style: outset;border-width: 2px;")
-
-        if(self.layer.kernel_size is not None):
-            c2dt_kernelsize_x.setText(str(self.layer.kernel_size[0]))
-            c2dt_kernelsize_y.setText(str(self.layer.kernel_size[1]))
-
-        layout.addWidget(c2dt_kernelsize_y)
-
-        self.config.append(c2dt_kernelsize_y)
-
         #strides
-        strides_label = QLabel("Strides: (x, y)")
+        strides_label = QLabel("Strides:")
         layout.addWidget(strides_label)
 
 
@@ -2080,24 +2041,15 @@ class EditLayerDialog(QDialog):
 
         c2dt_strides_x = QLineEdit()
         c2dt_strides_x.setValidator(validator)
-        c2dt_strides_x.setPlaceholderText("Strides x value")
-        c2dt_strides_x.setText(str(self.layer.strides[0]))
+        c2dt_strides_x.setPlaceholderText("Strides value")
+        c2dt_strides_x.setText(str(self.layer.strides))
         layout.addWidget(c2dt_strides_x)
 
         self.config.append(c2dt_strides_x)
 
-        c2dt_strides_y = QLineEdit()
-        c2dt_strides_y.setValidator(validator)
-        c2dt_strides_y.setPlaceholderText("Strides y value")
-        c2dt_strides_y.setText(str(self.layer.strides[1]))
-        layout.addWidget(c2dt_strides_y)
-
-        self.config.append(c2dt_strides_y)
-
         #PROBABLY DOESN'T WORK RIGHT
         c2dt_strides = []
         c2dt_strides.append(c2dt_strides_x.text())
-        c2dt_strides.append(c2dt_strides_y.text())
 
         #padding dropdown
         padding_label = QLabel("Padding:")
@@ -2114,7 +2066,7 @@ class EditLayerDialog(QDialog):
         self.config.append(c2dt_padding)
 
         #dialation rate
-        dialationrate_label = QLabel("Dialation Rate: (x, y)")
+        dialationrate_label = QLabel("Dilation Rate:")
         layout.addWidget(dialationrate_label)
 
         #add text box
@@ -2122,24 +2074,14 @@ class EditLayerDialog(QDialog):
 
         c2dt_dialationrate_x = QLineEdit()
         c2dt_dialationrate_x.setValidator(validator)
-        c2dt_dialationrate_x.setPlaceholderText("Dialation Rate x value")
-        c2dt_dialationrate_x.setText("1")
+        c2dt_dialationrate_x.setPlaceholderText("Dilation Rate value")
         layout.addWidget(c2dt_dialationrate_x)
 
         self.config.append(c2dt_dialationrate_x)
 
-        c2dt_dialationrate_y = QLineEdit()
-        c2dt_dialationrate_y.setValidator(validator)
-        c2dt_dialationrate_y.setPlaceholderText("Dialation Rate y value")
-        c2dt_dialationrate_y.setText("1")
-
-        layout.addWidget(c2dt_dialationrate_y)
-
         if self.layer.dialation_rate:
-            c2dt_dialationrate_x.setText(str(self.layer.dialation_rate[0]))
-            c2dt_dialationrate_y.setText(str(self.layer.dialation_rate[1]))
+            c2dt_dialationrate_x.setText(str(self.layer.dialation_rate))
 
-        self.config.append(c2dt_dialationrate_y)
 
         #groups
         groups_label = QLabel("Groups:")
@@ -2182,7 +2124,7 @@ class EditLayerDialog(QDialog):
         k_initializer_label = QLabel("Kernel Initializer:")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
-        kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
+        kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
         if self.layer.kernel_initializer:
             index = kernel_initializer.findText(self.layer.kernel_initializer, QtCore.Qt.MatchFixedString)
         if index >= 0:
@@ -2210,7 +2152,6 @@ class EditLayerDialog(QDialog):
         # Add widgets specific to configuring layer
         pass
 
-
     def configureSimpleRNNLayer(self, layout):
 
         #validator for text box input (regex)
@@ -2219,7 +2160,8 @@ class EditLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -2329,22 +2271,6 @@ class EditLayerDialog(QDialog):
 
         self.config.append(srnn_recurrent_dropout)
 
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        srnn_seed = QLineEdit()
-        srnn_seed.setPlaceholderText("Seed")
-        srnn_seed.setValidator(validator)
-        if(self.layer.seed is not None):
-            srnn_seed.setText(str(self.layer.seed))
-
-
-        layout.addWidget(srnn_seed)
-
-        self.config.append(srnn_seed)
-
         # Add widgets specific to configuring layer
         pass
 
@@ -2356,7 +2282,8 @@ class EditLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -2490,25 +2417,10 @@ class EditLayerDialog(QDialog):
         lstm_recurrent_dropout = QLineEdit()
         lstm_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
         lstm_recurrent_dropout.setValidator(float_validator)
-        lstm_recurrent_dropout.setText(str(self.layer.dropout))
+        lstm_recurrent_dropout.setText(str(self.layer.recurrent_dropout))
         layout.addWidget(lstm_recurrent_dropout)
 
         self.config.append(lstm_recurrent_dropout)
-
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        lstm_seed = QLineEdit()
-        lstm_seed.setPlaceholderText("Seed")
-        lstm_seed.setValidator(validator)
-        if(self.layer.seed is not None):
-            lstm_seed.setText(str(self.layer.seed))
-
-        layout.addWidget(lstm_seed)
-
-        self.config.append(lstm_seed)
 
         # Add widgets specific to configuring layer
         pass
@@ -2521,7 +2433,8 @@ class EditLayerDialog(QDialog):
         float_validator = QRegularExpressionValidator(QRegularExpression('^(\d)*(\.)?([0-9]{1})?$'))
 
         #units
-        units_label = QLabel("Units:")
+        units_label = QLabel("\u24D8 Units:")
+        units_label.setToolTip("Positive integer, dimensionality of the output space")
         layout.addWidget(units_label)
 
         #add text box
@@ -2645,20 +2558,6 @@ class EditLayerDialog(QDialog):
 
         self.config.append(gru_recurrent_dropout)
 
-        #seed
-        seed_label = QLabel("Seed:")
-        layout.addWidget(seed_label)
-
-        #add text box
-        gru_seed = QLineEdit()
-        gru_seed.setPlaceholderText("Seed")
-        gru_seed.setValidator(validator)
-        if(self.layer.seed is not None):
-            gru_seed.setText(str(self.layer.seed))
-        layout.addWidget(gru_seed)
-
-        self.config.append(gru_seed)
-
         #reset after dropdown
         reset_after_label = QLabel("Reset After:")
         layout.addWidget(reset_after_label)
@@ -2675,6 +2574,140 @@ class EditLayerDialog(QDialog):
         # Add widgets specific to configuring layer
         pass
 
+    def saveLayer(self):
+        # Append to main dictionary the layer type the user wants to add
+        length = len(nnet.datadict["model_1"]["layers"])
+
+        global index
+
+
+        if self.layer_type == "dense":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Dense(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    True if self.config[2].currentText() == "True" else False, 
+                    self.config[3].currentText(),
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "flatten":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Flatten(
+                    length
+                    )
+                )
+        elif self.layer_type == "zero_padding_2d":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Zero_Padding_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text())))
+                    )
+                )
+        elif self.layer_type == "average_pooling_2d":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Average_Pooling_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "max_pooling_2d":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Max_Pool_2d(
+                    length, 
+                    (int(float(self.config[0].text())), int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text())), int(float(self.config[3].text()))), 
+                    self.config[4].currentText()
+                    )
+                )
+        elif self.layer_type == "convolution_2d":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Convolution_2d(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text())), int(float(self.config[2].text()))), 
+                    (int(float(self.config[3].text())), int(float(self.config[4].text()))), 
+                    self.config[5].currentText(), 
+                    (int(float(self.config[6].text())), int(float(self.config[7].text()))), 
+                    int(float(self.config[8].text())), 
+                    self.config[9].currentText(), 
+                    self.config[10].currentText(), 
+                    self.config[11].currentText(), 
+                    self.config[12].currentText()
+                    )
+                )
+        elif self.layer_type == "convolution_2d_transpose":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                Convolution_2d_Transpose(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    (int(float(self.config[1].text()))), 
+                    (int(float(self.config[2].text()))), 
+                    self.config[3].currentText(), 
+                    (int(float(self.config[4].text()))), 
+                    int(float(self.config[5].text())), 
+                    self.config[6].currentText(), 
+                    self.config[7].currentText(), 
+                    self.config[8].currentText(), 
+                    self.config[9].currentText()
+                    )
+                )
+        elif self.layer_type == "simplernn":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                SimpleRNN(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    float(self.config[6].text()), 
+                    float(self.config[7].text())
+                    )
+                )
+        elif self.layer_type == "lstm":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                LSTM(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    self.config[7].currentText(), 
+                    float(self.config[8].text()), 
+                    float(self.config[9].text())
+                    )
+                )
+        elif self.layer_type == "gru":
+            nnet.datadict["model_1"]["layers"].insert(index,
+                GRU(
+                    length, 
+                    int(float(self.config[0].text())), 
+                    self.config[1].currentText(), 
+                    self.config[2].currentText(), 
+                    self.config[3].currentText(), 
+                    self.config[4].currentText(), 
+                    self.config[5].currentText(), 
+                    self.config[6].currentText(), 
+                    float(self.config[7].text()), 
+                    float(self.config[8].text()), 
+                    self.config[9].currentText()
+                    )
+                )    
+        
+        del nnet.datadict["model_1"]["layers"][index+1]
+
+
+        nnet.layoutChanged.emit()
+        self.accept()
+
 class UsePresetDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -2686,7 +2719,7 @@ class UsePresetDialog(QDialog):
         self.comboBox = QComboBox()
 
         #Options for it
-        self.comboBox.addItems(["Standard Neural Network", "Convolutional NN", "Recurrent NN", "EEGNET-like"])
+        self.comboBox.addItems(["Standard Neural Network", "Convolutional NN", "Recurrent NN"])
         layout.addWidget(self.comboBox)
 
         #Dialog buttons
@@ -2694,16 +2727,54 @@ class UsePresetDialog(QDialog):
         layout.addWidget(self.buttons)
 
         #Connect buttons
-        self.buttons.accepted.connect(self.accept)
+        self.buttons.accepted.connect(self.confirmPreset)
         self.buttons.rejected.connect(self.reject)
 
         self.setMinimumSize(300, 100)
+
+    def confirmPreset(self):
+        dialog = ConfirmPresetDialog(self.comboBox.currentText(), self)
+        dialog.exec()
+        self.accept()
+
+class ConfirmPresetDialog(QDialog):
+
+    def __init__(self, preset, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Confirm Preset")
+
+        layout = QVBoxLayout(self)
+
+        self.preset = preset
+
+        #slider for testing split
+        self.label = QLabel('Are you sure you want to use this preset?\nDoing so will delete your previous layers')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        #Dialog buttons
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Save)
+        layout.addWidget(self.buttons)
+
+        #Connect buttons
+        self.buttons.accepted.connect(self.usePreset)
+        self.buttons.rejected.connect(self.reject)
+
+        self.setMinimumSize(300, 100)
+
+    def usePreset(self):
+
+        nnet.datadict["model_1"]["layers"] = []
+        for layer in defaults[self.preset]:
+            nnet.datadict["model_1"]["layers"].append(layer)
+        nnet.layoutChanged.emit()
+        self.accept()
 
 class ConfigureInputDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configure Input")
-
+        self.setMinimumSize(400,250)
         self.config = []
 
         layout = QVBoxLayout(self)
@@ -2806,7 +2877,6 @@ class MainWindow(QMainWindow):
         # Main layout for the central widget.
         main_layout = QVBoxLayout(main_widget)
 
-        
         self.todoView = QListView()
         self.todoView.setStyleSheet("font: 20pt")
         self.todoView.setModel(nnet)
@@ -2815,11 +2885,17 @@ class MainWindow(QMainWindow):
         # Buttons
         buttons_layout = QHBoxLayout()
         self.add_layer_button = QPushButton("Add Layer")
+        self.add_layer_button.setToolTip("Add a layer to the Model.")
         self.edit_layer_button = QPushButton("Edit Layer")
+        self.edit_layer_button.setToolTip("Edit the selected layer.")
         self.remove_layer_button = QPushButton("Remove Layer")
+        self.remove_layer_button.setToolTip("Remove the selected layer from the model")
         self.use_preset_button = QPushButton("Use Preset")
+        self.use_preset_button.setToolTip("Use a built-in model and import it into the screen.")
         self.configure_input_button = QPushButton("Configure Input")
+        self.configure_input_button.setToolTip("Configure the model parameters")
         self.test_input_button = QPushButton("Configure Testing")
+        self.test_input_button.setToolTip("Configure the testing parameters")
         buttons = [self.add_layer_button, self.remove_layer_button, self.edit_layer_button, self.use_preset_button, self.configure_input_button, self.test_input_button]
         for button in buttons:
             if isinstance(button, QPushButton):
@@ -2829,6 +2905,7 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(buttons_layout)
 
         self.train_button = QPushButton("Train Model")
+        self.train_button.setToolTip("Train the model")
 
         main_layout.addWidget(self.train_button)
 
@@ -2849,6 +2926,8 @@ class MainWindow(QMainWindow):
         self.remove_layer_button.clicked.connect(self.deleteLayer)
 
         self.edit_layer_button.clicked.connect(self.openEditLayerModal)
+
+        self.train_button.clicked.connect(self.trainModel)
 
 
         # Adjust the main window's size to ensure content is visible.
@@ -2900,30 +2979,8 @@ class MainWindow(QMainWindow):
         else:
             index = -1
 
-        
-
-def parseData(rootPath):
-
-    labelledData = []
-    visited = set()
-
-    for participant in os.listdir(rootPath):
-
-        labels = os.path.join(rootPath, participant)
-
-        for i, label in enumerate(os.listdir(labels)):
-            if label not in visited:
-                data = [[], label]
-                labelledData.append(data)
-                visited.add(label)
-
-            files = os.path.join(labels, label)
-            for file in os.listdir(files):
-                updatedPath = os.path.join(files, file)
-
-                labelledData[i][0].append(updatedPath)
-
-    return labelledData
+    def trainModel(self):
+        process_model(nnet.datadict)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
