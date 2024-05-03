@@ -33,4 +33,5 @@ Step 6: Open PowerShell and run this command pip config -v list <br>
 
 ### Installing Packages for pip
 Step 1: Open PowerShell <br>
+Step 2: using the commands ls and cd locate the location of requirements.txt
 Step 2: Run this command pip install -r requirements.txt <br>
