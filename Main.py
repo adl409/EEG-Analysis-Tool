@@ -103,7 +103,10 @@ class TestConfigDialog(QDialog):
         layout.addWidget(self.model_input)
 
         #slider for testing split
-        self.label = QLabel('Data Testing Split: 20%')
+
+        labelInfo = 'Data Testing Split: ' + str(int(nnet.datadict["test_parameters"]["test_split"]*100)) + "%"
+
+        self.label = QLabel(labelInfo)
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
         self.slider = QSlider(Qt.Horizontal)
@@ -759,6 +762,9 @@ class ConfigureAddLayerDialog(QDialog):
 
     def configureSimpleRNNLayer(self, layout):
 
+        simple_rnn_desc_label = QLabel("Basic Recurrent Neural Network, utilizes previously seen data during training to better forecast future sequential data")
+        layout.addWidget(simple_rnn_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
@@ -778,7 +784,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(srnn_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use")
         layout.addWidget(activation_label)
         srnn_activation = QComboBox()
         srnn_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
@@ -787,7 +794,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(srnn_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer uses a bias vector")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -796,7 +804,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
@@ -805,7 +814,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent_kernel weights matrix, used for the linear transformation of the recurrent state")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
@@ -814,7 +824,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -823,7 +834,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
@@ -836,7 +848,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(srnn_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Recurrent Dropout - Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0.")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
@@ -852,6 +865,9 @@ class ConfigureAddLayerDialog(QDialog):
         pass
 
     def configureLSTMLayer(self, layout):
+
+        lstm_desc_label = QLabel("Long Short-Term Memory layer - Subset of RNN able to handle long-term dependencies, takes in 2D input and outputs 1D data")
+        layout.addWidget(lstm_desc_label)
 
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
@@ -872,7 +888,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(lstm_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use.")
         layout.addWidget(activation_label)
         lstm_activation = QComboBox()
         lstm_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
@@ -881,7 +898,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(lstm_activation)
 
         #recurrent activation dropdown
-        recurrent_activation_label = QLabel("Recurrent Activation Type:")
+        recurrent_activation_label = QLabel("\u24D8 Recurrent Activation Type:")
+        recurrent_activation_label.setToolTip("Activation function to use for the recurrent step.")
         layout.addWidget(recurrent_activation_label)
         lstm_recurrent_activation = QComboBox()
         lstm_recurrent_activation.addItems(["sigmoid", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -890,7 +908,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(lstm_recurrent_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer should use a bias vector.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -899,7 +918,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs.")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
@@ -908,7 +928,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent kernel weights matrix, used for the linear transformation of the recurrent state.")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
@@ -917,7 +938,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -926,7 +948,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #unit forget bias dropdown
-        unit_forget_bias_label = QLabel("Use Bias:")
+        unit_forget_bias_label = QLabel("\u24D8 Unit Forget Bias:")
+        unit_forget_bias_label.setToolTip("Boolean. If True, add 1 to the bias of the forget gate at initialization. Setting it to True will also force bias initializer = “zeros”.")
         layout.addWidget(unit_forget_bias_label)
         unit_forget_bias = QComboBox()
         unit_forget_bias.addItems(["True", "False"])
@@ -936,20 +959,22 @@ class ConfigureAddLayerDialog(QDialog):
 
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         lstm_dropout = QLineEdit()
         lstm_dropout.setPlaceholderText("Dropout")
-        # lstm_dropout.setValidator(float_validator)
+        lstm_dropout.setValidator(float_validator)
         layout.addWidget(lstm_dropout)
 
         self.config.append(lstm_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Recurrent Dropout - Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0.")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
@@ -965,6 +990,9 @@ class ConfigureAddLayerDialog(QDialog):
         pass
 
     def configureGRULayer(self, layout):
+
+        gru_desc_label = QLabel("Gated Recurrent Unit - Subset of RNN that allows for selective storing and replacing of previously seen data")
+        layout.addWidget(gru_desc_label)
 
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
@@ -985,7 +1013,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(gru_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use.")
         layout.addWidget(activation_label)
         gru_activation = QComboBox()
         gru_activation.addItems(["tanh", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus"])
@@ -994,7 +1023,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(gru_activation)
 
         #recurrent activation dropdown
-        recurrent_activation_label = QLabel("Recurrent Activation Type:")
+        recurrent_activation_label = QLabel("\u24D8 Recurrent Activation Type:")
+        recurrent_activation_label.setToolTip("Activation function to use for the recurrent step.")
         layout.addWidget(recurrent_activation_label)
         gru_recurrent_activation = QComboBox()
         gru_recurrent_activation.addItems(["sigmoid", "elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -1003,7 +1033,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(gru_recurrent_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer should use a bias vector.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -1012,7 +1043,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs.")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["glorot uniform", "zeros", "glorot normal", "orthogonal"])
@@ -1021,7 +1053,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent kernel weights matrix, used for the linear transformation of the recurrent state.")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["orthogonal", "zeros", "glorot normal", "glorot uniform"])
@@ -1030,7 +1063,8 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -1039,33 +1073,36 @@ class ConfigureAddLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         gru_dropout = QLineEdit()
         gru_dropout.setPlaceholderText("Dropout")
-        # gru_dropout.setValidator(float_validator)
+        gru_dropout.setValidator(float_validator)
         layout.addWidget(gru_dropout)
 
         self.config.append(gru_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
         #GET MAD IF USER PUTS IN FUNKY STUFF (anything besides numbers and a decimal)
         gru_recurrent_dropout = QLineEdit()
         gru_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
-        # lstm_recurrent_dropout.setValidator(float_validator)
+        gru_recurrent_dropout.setValidator(float_validator)
         layout.addWidget(gru_recurrent_dropout)
 
         self.config.append(gru_recurrent_dropout)
 
         #reset after dropdown
-        reset_after_label = QLabel("Reset After:")
+        reset_after_label = QLabel("\u24D8 Reset After:")
+        reset_after_label.setToolTip("GRU convention (whether to apply reset gate after or before matrix multiplication). False is before, True is after.")
         layout.addWidget(reset_after_label)
         reset_after = QComboBox()
         reset_after.addItems(["True", "False"])
@@ -2274,6 +2311,9 @@ class EditLayerDialog(QDialog):
 
     def configureSimpleRNNLayer(self, layout):
 
+        simple_rnn_desc_label = QLabel("Basic Recurrent Neural Network, utilizes previously seen data during training to better forecast future sequential data")
+        layout.addWidget(simple_rnn_desc_label)
+
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
 
@@ -2294,7 +2334,8 @@ class EditLayerDialog(QDialog):
         self.config.append(srnn_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use")
         layout.addWidget(activation_label)
         srnn_activation = QComboBox()
         srnn_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -2308,7 +2349,8 @@ class EditLayerDialog(QDialog):
         self.config.append(srnn_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer uses a bias vector")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -2322,7 +2364,8 @@ class EditLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2335,7 +2378,8 @@ class EditLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent_kernel weights matrix, used for the linear transformation of the recurrent state")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2349,7 +2393,8 @@ class EditLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2364,7 +2409,8 @@ class EditLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
@@ -2378,7 +2424,8 @@ class EditLayerDialog(QDialog):
         self.config.append(srnn_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Recurrent Dropout - Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0.")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
@@ -2395,6 +2442,9 @@ class EditLayerDialog(QDialog):
         pass
 
     def configureLSTMLayer(self, layout):
+
+        lstm_desc_label = QLabel("Long Short-Term Memory layer - Subset of RNN able to handle long-term dependencies, takes in 2D input and outputs 1D data")
+        layout.addWidget(lstm_desc_label)
 
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
@@ -2416,7 +2466,8 @@ class EditLayerDialog(QDialog):
         self.config.append(lstm_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use.")
         layout.addWidget(activation_label)
         lstm_activation = QComboBox()
         lstm_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -2429,7 +2480,8 @@ class EditLayerDialog(QDialog):
         self.config.append(lstm_activation)
 
         #recurrent activation dropdown
-        recurrent_activation_label = QLabel("Recurrent Activation Type:")
+        recurrent_activation_label = QLabel("\u24D8 Recurrent Activation Type:")
+        recurrent_activation_label.setToolTip("Activation function to use for the recurrent step.")
         layout.addWidget(recurrent_activation_label)
         lstm_recurrent_activation = QComboBox()
         lstm_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -2443,7 +2495,8 @@ class EditLayerDialog(QDialog):
         self.config.append(lstm_recurrent_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer should use a bias vector.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -2457,7 +2510,8 @@ class EditLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs.")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2471,7 +2525,8 @@ class EditLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent kernel weights matrix, used for the linear transformation of the recurrent state.")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2486,7 +2541,8 @@ class EditLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2500,7 +2556,8 @@ class EditLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #unit forget bias dropdown
-        unit_forget_bias_label = QLabel("Unit Forget Bias:")
+        unit_forget_bias_label = QLabel("\u24D8 Unit Forget Bias:")
+        unit_forget_bias_label.setToolTip("Boolean. If True, add 1 to the bias of the forget gate at initialization. Setting it to True will also force bias initializer = “zeros”.")
         layout.addWidget(unit_forget_bias_label)
         unit_forget_bias = QComboBox()
         unit_forget_bias.addItems(["True", "False"])
@@ -2515,7 +2572,8 @@ class EditLayerDialog(QDialog):
 
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
@@ -2529,7 +2587,8 @@ class EditLayerDialog(QDialog):
         self.config.append(lstm_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Recurrent Dropout - Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0.")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
@@ -2546,6 +2605,9 @@ class EditLayerDialog(QDialog):
         pass
 
     def configureGRULayer(self, layout):
+
+        gru_desc_label = QLabel("Gated Recurrent Unit - Subset of RNN that allows for selective storing and replacing of previously seen data")
+        layout.addWidget(gru_desc_label)
 
         #validator for text box input (regex)
         validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
@@ -2567,7 +2629,8 @@ class EditLayerDialog(QDialog):
         self.config.append(gru_units)
 
         #activation dropdown
-        activation_label = QLabel("Activation Type:")
+        activation_label = QLabel("\u24D8 Activation Type:")
+        activation_label.setToolTip("Activation function to use.")
         layout.addWidget(activation_label)
         gru_activation = QComboBox()
         gru_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -2581,7 +2644,8 @@ class EditLayerDialog(QDialog):
         self.config.append(gru_activation)
 
         #recurrent activation dropdown
-        recurrent_activation_label = QLabel("Recurrent Activation Type:")
+        recurrent_activation_label = QLabel("\u24D8 Recurrent Activation Type:")
+        recurrent_activation_label.setToolTip("Activation function to use for the recurrent step.")
         layout.addWidget(recurrent_activation_label)
         gru_recurrent_activation = QComboBox()
         gru_recurrent_activation.addItems(["elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
@@ -2595,7 +2659,8 @@ class EditLayerDialog(QDialog):
         self.config.append(gru_recurrent_activation)
 
         #use bias dropdown
-        bias_label = QLabel("Use Bias:")
+        bias_label = QLabel("\u24D8 Use Bias:")
+        bias_label.setToolTip("Boolean, whether the layer should use a bias vector.")
         layout.addWidget(bias_label)
         use_bias = QComboBox()
         use_bias.addItems(["True", "False"])
@@ -2609,7 +2674,8 @@ class EditLayerDialog(QDialog):
         self.config.append(use_bias)
 
         #kernel initializer
-        k_initializer_label = QLabel("Kernel Initializer:")
+        k_initializer_label = QLabel("\u24D8 Kernel Initializer:")
+        k_initializer_label.setToolTip("Initializer for the kernel weights matrix, used for the linear transformation of the inputs.")
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2623,12 +2689,13 @@ class EditLayerDialog(QDialog):
         self.config.append(kernel_initializer)
 
         #recurrent initializer
-        r_initializer_label = QLabel("Recurrent Initializer:")
+        r_initializer_label = QLabel("\u24D8 Recurrent Initializer:")
+        r_initializer_label.setToolTip("Initializer for the recurrent kernel weights matrix, used for the linear transformation of the recurrent state.")
         layout.addWidget(r_initializer_label)
         recurrent_initializer = QComboBox()
         recurrent_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
         if self.layer.recurrent_initializer:
-            index = recurrent_initializer.findText(self.layer.kernel_initializer, QtCore.Qt.MatchFixedString)
+            index = recurrent_initializer.findText(self.layer.recurrent_initializer, QtCore.Qt.MatchFixedString)
         if index >= 0:
             recurrent_initializer.setCurrentIndex(index)
 
@@ -2637,7 +2704,8 @@ class EditLayerDialog(QDialog):
         self.config.append(recurrent_initializer)
 
         #bias initializer
-        b_initializer_label = QLabel("Bias Initializer:")
+        b_initializer_label = QLabel("\u24D8 Bias Initializer:")
+        b_initializer_label.setToolTip("Initializer for the bias vector")
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform", "orthogonal"])
@@ -2651,7 +2719,8 @@ class EditLayerDialog(QDialog):
         self.config.append(bias_initializer)
 
         #dropout
-        dropout_label = QLabel("Dropout:")
+        dropout_label = QLabel("\u24D8 Dropout:")
+        dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs. Default is 0.")
         layout.addWidget(dropout_label)
 
         #add text box
@@ -2665,7 +2734,8 @@ class EditLayerDialog(QDialog):
         self.config.append(gru_dropout)
 
         #recurrent dropout
-        recurrent_dropout_label = QLabel("Recurrent Dropout:")
+        recurrent_dropout_label = QLabel("\u24D8 Recurrent Dropout:")
+        recurrent_dropout_label.setToolTip("Float between 0 and 1. Fraction of the units to drop for the linear transformation of the recurrent state. Default: 0")
         layout.addWidget(recurrent_dropout_label)
 
         #add text box
@@ -2673,13 +2743,14 @@ class EditLayerDialog(QDialog):
         gru_recurrent_dropout = QLineEdit()
         gru_recurrent_dropout.setPlaceholderText("Recurrent Dropout")
         gru_recurrent_dropout.setValidator(float_validator)
-        gru_recurrent_dropout.setText(str(self.layer.dropout))
+        gru_recurrent_dropout.setText(str(self.layer.recurrent_dropout))
         layout.addWidget(gru_recurrent_dropout)
 
         self.config.append(gru_recurrent_dropout)
 
         #reset after dropdown
-        reset_after_label = QLabel("Reset After:")
+        reset_after_label = QLabel("\u24D8 Reset After:")
+        reset_after_label.setToolTip("GRU convention (whether to apply reset gate after or before matrix multiplication). False is before, True is after.")
         layout.addWidget(reset_after_label)
         reset_after = QComboBox()
         reset_after.addItems(["True", "False"])
@@ -2948,7 +3019,7 @@ class ConfigureInputDialog(QDialog):
         width_input.setText(str(nnet.datadict["input_parameters"]["input_shape1"]))
         input_shape_layout.addWidget(QLabel("X"))
         input_shape_layout.addWidget(height_input)
-        height_input.setText(str(nnet.datadict["input_parameters"]["input_shape1"]))
+        height_input.setText(str(nnet.datadict["input_parameters"]["input_shape2"]))
 
         layout.addWidget(input_shape_group)
 
