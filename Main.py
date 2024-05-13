@@ -16,6 +16,32 @@ defaults = {
     "Recurrent NN": [SimpleRNN(0,16)]
 }
 
+# Mapping for Parameters
+mapping = {
+    None: "None",
+    True: "True",
+    False: "False",
+    "glorot_normal": "glorot normal",
+    "glorot_uniform": "glorot uniform",
+    "zeros": "zeros",
+    "elu": "elu",
+    "exponential": "exponential",
+    "gelu": "gelu",
+    "linear": "linear",
+    "relu": "relu",
+    "relu6": "relu6",
+    "leaky_relu": "leaky_relu",
+    "mish": "mish",
+    "selu": "selu",
+    "sigmoid": "sigmoid",
+    "hard_sigmoid": "hard sigmoid",
+    "silu": "silu",
+    "hard_silu": "hard silu",
+    "softmax": "softmax",
+    "softplus": "softplus",
+    "tanh": "tanh"
+}
+
 # Dictionary that hold configuration values and will eventually be passed to the backend
 class neuralnetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, data=None, **kwargs):
@@ -209,7 +235,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label.setToolTip("What activation function to use. If you picked None, no activation is applied")
         layout.addWidget(activation_label)
         dense_activation = QComboBox()
-        dense_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        dense_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(dense_activation)
 
         self.config.append(dense_activation)
@@ -588,7 +614,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label.setToolTip("Activation function. If None, no activation is applied")
         layout.addWidget(activation_label)
         c2d_activation = QComboBox()
-        c2d_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        c2d_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(c2d_activation)
 
         self.config.append(c2d_activation)
@@ -722,7 +748,7 @@ class ConfigureAddLayerDialog(QDialog):
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         c2dt_activation = QComboBox()
-        c2dt_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        c2dt_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(c2dt_activation)
 
         self.config.append(c2dt_activation)
@@ -1190,10 +1216,10 @@ class ConfigureAddLayerDialog(QDialog):
                     Dense(
                         length, 
                         int(float(self.config[0].text())), 
-                        None if self.config[1].currentText() == "none" else self.config[1].currentText(), 
-                        True if self.config[2].currentText() == "True" else False, 
-                        self.config[3].currentText(),
-                        self.config[4].currentText()
+                        list(mapping.keys())[list(mapping.values()).index(self.config[1].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[2].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[3].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
                         )
                     )
             elif self.layer_type == "Flatten":
@@ -1311,10 +1337,10 @@ class ConfigureAddLayerDialog(QDialog):
                     Dense(
                         length, 
                         int(float(self.config[0].text())), 
-                        self.config[1].currentText(), 
-                        True if self.config[2].currentText() == "True" else False, 
-                        self.config[3].currentText(),
-                        self.config[4].currentText()
+                        list(mapping.keys())[list(mapping.values()).index(self.config[1].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[2].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[3].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
                         )
                     )
             elif self.layer_type == "Flatten":
@@ -1432,10 +1458,10 @@ class ConfigureAddLayerDialog(QDialog):
                     Dense(
                         length, 
                         int(float(self.config[0].text())), 
-                        self.config[1].currentText(), 
-                        True if self.config[2].currentText() == "True" else False, 
-                        self.config[3].currentText(),
-                        self.config[4].currentText()
+                        list(mapping.keys())[list(mapping.values()).index(self.config[1].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[2].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[3].currentText())],
+                        list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
                         )
                     )
             elif self.layer_type == "Flatten":
@@ -1669,7 +1695,7 @@ class EditLayerDialog(QDialog):
         layout.addWidget(activation_label)
         dense_activation = QComboBox()
         dense_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
-        dense_activation.setCurrentText(self.layer.activation)
+        dense_activation.setCurrentText(mapping[self.layer.activation])
         layout.addWidget(dense_activation)
 
         self.config.append(dense_activation)
@@ -1694,7 +1720,7 @@ class EditLayerDialog(QDialog):
         layout.addWidget(k_initializer_label)
         kernel_initializer = QComboBox()
         kernel_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
-        kernel_initializer.setCurrentText(self.layer.kernel_initializer)
+        kernel_initializer.setCurrentText(mapping[self.layer.kernel_initializer])
         layout.addWidget(kernel_initializer)
 
         self.config.append(kernel_initializer)
@@ -1705,7 +1731,7 @@ class EditLayerDialog(QDialog):
         layout.addWidget(b_initializer_label)
         bias_initializer = QComboBox()
         bias_initializer.addItems(["zeros", "glorot normal", "glorot uniform"])
-        bias_initializer.setCurrentText(self.layer.bias_initializer)
+        bias_initializer.setCurrentText(mapping[self.layer.bias_initializer])
         layout.addWidget(bias_initializer)
         
         self.config.append(bias_initializer)
@@ -2094,7 +2120,7 @@ class EditLayerDialog(QDialog):
         activation_label.setToolTip("Activation function. If None, no activation is applied")
         layout.addWidget(activation_label)
         c2d_activation = QComboBox()
-        c2d_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        c2d_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         if self.layer.activation:
             index = c2d_activation.findText(self.layer.activation, QtCore.Qt.MatchFixedString)
         if index >= 0:
@@ -2258,7 +2284,7 @@ class EditLayerDialog(QDialog):
         activation_label = QLabel("Activation Type:")
         layout.addWidget(activation_label)
         c2dt_activation = QComboBox()
-        c2dt_activation.addItems(["none","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
+        c2dt_activation.addItems(["None","elu", "exponential", "gelu", "linear", "relu", "relu6", "leaky_relu", "mish", "selu", "sigmoid", "hard sigmoid", "silu", "hard silu", "softmax", "softplus", "tanh"])
         layout.addWidget(c2dt_activation)
 
         self.config.append(c2dt_activation)
@@ -2777,10 +2803,10 @@ class EditLayerDialog(QDialog):
                 Dense(
                     length, 
                     int(float(self.config[0].text())), 
-                    None if self.config[1].currentText() == "none" else self.config[1].currentText(), 
-                    True if self.config[2].currentText() == "True" else False, 
-                    self.config[3].currentText(),
-                    self.config[4].currentText()
+                    list(mapping.keys())[list(mapping.values()).index(self.config[1].currentText())],
+                    list(mapping.keys())[list(mapping.values()).index(self.config[2].currentText())],
+                    list(mapping.keys())[list(mapping.values()).index(self.config[3].currentText())],
+                    list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
                     )
                 )
         elif self.layer_type == "flatten":
