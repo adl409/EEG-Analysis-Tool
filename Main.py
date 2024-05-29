@@ -12,7 +12,7 @@ from layerClasses import *
 # Defaults for 
 defaults = {
     "Standard Neural Network": [Flatten(0),Dense(0, 64), Dense(0,64,"relu")],
-    "Convolutional NN": [Convolution_2d(0,filters=16, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=32, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=64, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)), Flatten(0), Dense(0,64), Dense(0,32) ],
+    "Convolutional NN": [Convolution_2d(0,filters=16, kernel_size=(3,3)), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=32, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)),Convolution_2d(0,filters=64, kernel_size=3), Max_Pool_2d(0,pool_size=(2,2)), Flatten(0), Dense(0,64), Dense(0,32) ],
     "Recurrent NN": [SimpleRNN(0,16)]
 }
 
