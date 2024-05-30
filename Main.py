@@ -1420,7 +1420,7 @@ class ConfigureAddLayerDialog(QDialog):
                 nnet.datadict["model_1"]["layers"].append(index,
                     Dropout(
                         length,
-                        (int(float(self.config[0].text()))), int(self.config[1].text()))
+                        (int(float(self.config[0].text()))), int(self.config[1].text())
                         )
                     )
             elif self.layer_type == "Zero Padding 2d":
