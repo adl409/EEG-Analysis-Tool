@@ -209,7 +209,7 @@ class ConfigureAddLayerDialog(QDialog):
             self.configureLSTMLayer(layout)
         elif self.layer_type == "GRU":
             self.configureGRULayer(layout)
-        elif self.layer_type == "dropout":
+        elif self.layer_type == "Dropout":
             self.configureDropoutLayer(layout)
         # Add conditions for other layer types
 
@@ -1417,7 +1417,7 @@ class ConfigureAddLayerDialog(QDialog):
                         )
                     )
             elif self.layer_type == "Dropout":
-                nnet.datadict["model_1"]["layers"].append(index,
+                nnet.datadict["model_1"]["layers"].append(
                     Dropout(
                         length,
                         (int(float(self.config[0].text()))), int(self.config[1].text())
