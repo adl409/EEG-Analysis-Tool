@@ -1676,7 +1676,7 @@ class AddLayerDialog(QDialog):
         layout.addWidget(self.label)
 
         self.comboBox = QComboBox()
-        self.comboBox.addItems(["Dense", "Flatten", "Zero Padding 2d", "Average Pooling 2d", "Max Pooling 2d", "Convolution 2d", "Simple RNN", "LSTM", "GRU". "Dropout"])
+        self.comboBox.addItems(["Dense", "Flatten", "Zero Padding 2d", "Average Pooling 2d", "Max Pooling 2d", "Convolution 2d", "Simple RNN", "LSTM", "GRU", "Dropout"])
         layout.addWidget(self.comboBox)
 
         self.label2 = QLabel("\u24D8 Layer Location:")
