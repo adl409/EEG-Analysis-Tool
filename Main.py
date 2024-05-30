@@ -209,7 +209,7 @@ class ConfigureAddLayerDialog(QDialog):
             self.configureLSTMLayer(layout)
         elif self.layer_type == "GRU":
             self.configureGRULayer(layout)
-        elif self.layer_type == "Dropout":
+        elif self.layer_type == "dropout":
             self.configureDropoutLayer(layout)
         # Add conditions for other layer types
 
@@ -219,9 +219,49 @@ class ConfigureAddLayerDialog(QDialog):
 
         buttons.accepted.connect(self.saveLayer)    # Saving configuration function
         buttons.rejected.connect(self.reject)
+        
     def configureDropoutLayer(self, layout):
-        dropout_desc_label = QLabel("Dropout - Regularization technique used in Neural Network to prevent overfitting")
+        
+        dropout_desc_label = QLabel("Dropout - Layer for applying dropout regularization")
         layout.addWidget(dropout_desc_label)
+        
+        # Validator for rate text box input (regex for float between 0 and 1)
+        rate_validator = QRegularExpressionValidator(QRegularExpression(r'^0(\.\d+)?|1(\.0+)?$'))
+
+        rate_label = QLabel("\u24D8 Rate:")
+        rate_label.setToolTip("Float between 0 and 1, fraction of the input units to drop")
+
+        # Add text box for rate
+        dropout_rate = QLineEdit()
+        dropout_rate.setPlaceholderText("Rate")
+        dropout_rate.setValidator(rate_validator)
+        dropout_rate.setStyleSheet("border-style: outset;border-width: 2px;")
+        layout.addWidget(rate_label)
+        layout.addWidget(dropout_rate)
+
+        self.config.append(dropout_rate)
+
+        # Validator for seed text box input (regex for integers)
+        seed_validator = QRegularExpressionValidator(QRegularExpression(r'^\d+$'))
+
+        seed_label = QLabel("\u24D8 Seed:")
+        seed_label.setToolTip("Integer, random seed for reproducibility")
+
+        # Add text box for seed
+        dropout_seed = QLineEdit()
+        dropout_seed.setPlaceholderText("Seed")
+        dropout_seed.setValidator(seed_validator)
+        dropout_seed.setStyleSheet("border-style: outset;border-width: 2px;")
+        layout.addWidget(seed_label)
+        layout.addWidget(dropout_seed)
+
+        self.config.append(dropout_seed)
+
+        # Add widgets specific to configuring Dropout layer
+        pass
+
+        
+    
     def configureDenseLayer(self, layout):
 
         dense_desc_label = QLabel("Dense - 1D layer of fully connected neurons")
@@ -1247,6 +1287,13 @@ class ConfigureAddLayerDialog(QDialog):
                         0
                         )
                     )
+            elif self.layer_type == "Dropout":
+                nnet.datadict["model_1"]["layers"].insert(0,
+                    Dropout(
+                        0,
+                        (int(float(self.config[0].text()))), int(self.config[1].text()))
+                        )
+                    )
             elif self.layer_type == "Zero Padding 2d":
                 nnet.datadict["model_1"]["layers"].insert(0,
                     Zero_Padding_2d(
@@ -1369,6 +1416,13 @@ class ConfigureAddLayerDialog(QDialog):
                         length
                         )
                     )
+            elif self.layer_type == "Dropout":
+                nnet.datadict["model_1"]["layers"].append(index,
+                    Dropout(
+                        length,
+                        (int(float(self.config[0].text()))), int(self.config[1].text()))
+                        )
+                    )
             elif self.layer_type == "Zero Padding 2d":
                 nnet.datadict["model_1"]["layers"].append(
                     Zero_Padding_2d(
@@ -1483,6 +1537,13 @@ class ConfigureAddLayerDialog(QDialog):
                         list(mapping.keys())[list(mapping.values()).index(self.config[2].currentText())],
                         list(mapping.keys())[list(mapping.values()).index(self.config[3].currentText())],
                         list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
+                        )
+                    )
+            elif self.layer_type == "dropout":
+                nnet.datadict["model_1"]["layers"].insert(index + 1,
+                    Dropout(
+                        length,
+                        (int(float(self.config[0].text()))), int(self.config[1].text()))
                         )
                     )
             elif self.layer_type == "Flatten":
@@ -1680,6 +1741,8 @@ class EditLayerDialog(QDialog):
             self.configureLSTMLayer(layout)
         elif self.layer_type == "gru":
             self.configureGRULayer(layout)
+        elif self.layer_type == "dropout":
+            self.configureDropoutLayer(layout)
         # Add conditions for other layer types
 
         # Dialog buttons
@@ -1689,6 +1752,46 @@ class EditLayerDialog(QDialog):
         buttons.accepted.connect(self.saveLayer)
         buttons.rejected.connect(self.reject)
 
+    def configureDropoutLayer(self, layout):
+        
+        dropout_desc_label = QLabel("Dropout - Layer for applying dropout regularization")
+        layout.addWidget(dropout_desc_label)
+        
+        # Validator for rate text box input (regex for float between 0 and 1)
+        rate_validator = QRegularExpressionValidator(QRegularExpression(r'^0(\.\d+)?|1(\.0+)?$'))
+
+        rate_label = QLabel("\u24D8 Rate:")
+        rate_label.setToolTip("Float between 0 and 1, fraction of the input units to drop")
+
+        # Add text box for rate
+        dropout_rate = QLineEdit()
+        dropout_rate.setPlaceholderText("Rate")
+        dropout_rate.setValidator(rate_validator)
+        dropout_rate.setStyleSheet("border-style: outset;border-width: 2px;")
+        layout.addWidget(rate_label)
+        layout.addWidget(dropout_rate)
+
+        self.config.append(dropout_rate)
+
+        # Validator for seed text box input (regex for integers)
+        seed_validator = QRegularExpressionValidator(QRegularExpression(r'^\d+$'))
+
+        seed_label = QLabel("\u24D8 Seed:")
+        seed_label.setToolTip("Integer, random seed for reproducibility")
+
+        # Add text box for seed
+        dropout_seed = QLineEdit()
+        dropout_seed.setPlaceholderText("Seed")
+        dropout_seed.setValidator(seed_validator)
+        dropout_seed.setStyleSheet("border-style: outset;border-width: 2px;")
+        layout.addWidget(seed_label)
+        layout.addWidget(dropout_seed)
+
+        self.config.append(dropout_seed)
+
+        # Add widgets specific to configuring Dropout layer
+        pass
+        
     def configureDenseLayer(self, layout):
 
         dense_desc_label = QLabel("Dense - 1D layer of fully connected neurons")
@@ -2757,12 +2860,14 @@ class EditLayerDialog(QDialog):
                     list(mapping.keys())[list(mapping.values()).index(self.config[4].currentText())]
                     )
                 )
-        elif self.layer_type == "flatten":
+        elif self.layer_type == "dropout":
             nnet.datadict["model_1"]["layers"].insert(index,
-                Flatten(
-                    length
+                Dropout(
+                    length,
+                    (int(float(self.config[0].text()))), int(self.config[1].text()))
                     )
                 )
+            
         elif self.layer_type == "zero_padding_2d":
             nnet.datadict["model_1"]["layers"].insert(index,
                 Zero_Padding_2d(
