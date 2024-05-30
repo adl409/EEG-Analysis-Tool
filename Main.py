@@ -209,6 +209,8 @@ class ConfigureAddLayerDialog(QDialog):
             self.configureLSTMLayer(layout)
         elif self.layer_type == "GRU":
             self.configureGRULayer(layout)
+        elif self.layer_type == "Dropout":
+            self.configureDropoutLayer(layout)
         # Add conditions for other layer types
 
         # Dialog buttons
@@ -217,7 +219,9 @@ class ConfigureAddLayerDialog(QDialog):
 
         buttons.accepted.connect(self.saveLayer)    # Saving configuration function
         buttons.rejected.connect(self.reject)
-
+    def configureDropoutLayer(self, layout):
+        dropout_desc_label = QLabel("Dropout - Regularization technique used in Neural Network to prevent overfitting")
+        layout.addWidget(dropout_desc_label)
     def configureDenseLayer(self, layout):
 
         dense_desc_label = QLabel("Dense - 1D layer of fully connected neurons")
