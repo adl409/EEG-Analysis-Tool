@@ -151,5 +151,5 @@ class Dropout(Layer):
     def __init__(self, index, rate=0.0, seed=None):
         self.rate = rate
         self.seed = seed
-        self.layerTyper = "dropout"
+        self.layerType = "dropout"
         self.displayName = "Dropout"
