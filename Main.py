@@ -1291,7 +1291,7 @@ class ConfigureAddLayerDialog(QDialog):
                 nnet.datadict["model_1"]["layers"].insert(0,
                     Dropout(
                         0,
-                        (int(float(self.config[0].text()))), int(self.config[1].text()))
+                        (int(float(self.config[0].text()))), int(self.config[1].text())
                         )
                     )
             elif self.layer_type == "Zero Padding 2d":
@@ -1543,7 +1543,7 @@ class ConfigureAddLayerDialog(QDialog):
                 nnet.datadict["model_1"]["layers"].insert(index + 1,
                     Dropout(
                         length,
-                        (int(float(self.config[0].text()))), int(self.config[1].text()))
+                        (int(float(self.config[0].text()))), int(self.config[1].text())
                         )
                     )
             elif self.layer_type == "Flatten":
@@ -2864,7 +2864,7 @@ class EditLayerDialog(QDialog):
             nnet.datadict["model_1"]["layers"].insert(index,
                 Dropout(
                     length,
-                    (int(float(self.config[0].text()))), int(self.config[1].text()))
+                    (int(float(self.config[0].text()))), int(self.config[1].text())
                     )
                 )
             
