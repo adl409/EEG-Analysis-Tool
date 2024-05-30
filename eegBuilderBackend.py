@@ -144,7 +144,10 @@ def make_model(models, numLabels):
                 
             case "gru":
                  model.add(tf.keras.layers.GRU(units = layer.units, activation = layer.activation, use_bias = layer.use_bias, kernel_initializer = layer.kernel_initializer, recurrent_initializer = layer.recurrent_initializer, bias_initializer = layer.bias_initializer, dropout = layer.dropout, recurrent_dropout = layer.recurrent_dropout, seed = layer.seed, recurrent_activation = layer.recurrent_activation, reset_after = layer.reset_after))
-
+            
+            case "dropout":
+                 model.add(tf.keras.layers.Dropout(rate = layer.rate, seed = layer.seed))
+                
             case _ :
                 print("Error Determining layer type...")
     
