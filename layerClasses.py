@@ -141,8 +141,8 @@ class GRU(Layer):
         self.bias_initializer = bias_initializer
         self.dropout = dropout
         self.recurrent_dropout = recurrent_dropout
-        self.seed=seed
-        self.reset_after=reset_after
+        self.seed = seed
+        self.reset_after = reset_after
         self.layerType = "gru"
         self.displayName = "Gated Recurrent Unit"
 
@@ -151,3 +151,5 @@ class Dropout(Layer):
     def __init__(self, index, rate=0.0, seed=None):
         self.rate = rate
         self.seed = seed
+        self.layerTyper = "dropout"
+        self.displayName = "Dropout"
