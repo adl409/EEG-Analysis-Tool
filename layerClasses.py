@@ -145,3 +145,9 @@ class GRU(Layer):
         self.reset_after=reset_after
         self.layerType = "gru"
         self.displayName = "Gated Recurrent Unit"
+
+class Dropout(Layer):
+    
+    def __init__(self, index, rate, seed):
+        self.rate = rate
+        self.seed = seed
