@@ -1256,18 +1256,17 @@ class ConfigureAddLayerDialog(QDialog):
             QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d layer layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
             return
         
-        if self.layer_type == "Simple RNN" and self.CNNlayerCompatibilityChecker():
+        if (self.layer_type == "Simple RNN" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "Simple RNN" and self.RNNlayerCompatibilityChecker()):
             QMessageBox.warning(self, "Invalid Layer", "Cannot add Simple RNN layer because something besides Dense and Flatten is in.")
             return
         
-        if self.layer_type == "LSTM" and self.CNNlayerCompatibilityChecker():
+        if (self.layer_type == "LSTM" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "LSTM" and self.RNNlayerCompatibilityChecker()):
             QMessageBox.warning(self, "Invalid Layer", "Cannot add LSTM layer because something besides Dense and Flatten is in.")
             return
         
-        if self.layer_type == "GRU" and self.CNNlayerCompatibilityChecker():
+        if (self.layer_type == "GRU" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "GRU" and self.RNNlayerCompatibilityChecker()):
             QMessageBox.warning(self, "Invalid Layer", "Cannot add GRU layer because something besides Dense and Flatten is in.")
             return
-
 
         if(self.layer_location == "Beginning of list"):
             if self.layer_type == "Dense":
