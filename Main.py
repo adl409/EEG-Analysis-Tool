@@ -1248,24 +1248,28 @@ class ConfigureAddLayerDialog(QDialog):
             QMessageBox.warning(self, "Invalid Layer", "Cannot add Max pooling 2d layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
             return
         
-        if self.layer_type == "Convlution 2d" and self.RNNlayerCompatibilityChecker():
+        if self.layer_type == "Average Pooling 2d" and self.RNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Average pooling 2d layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
+            return
+        
+        if self.layer_type == "Convolution 2d" and self.RNNlayerCompatibilityChecker():
             QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
             return
         
-        if self.layer_type == "Convlution 2d Transpose" and self.RNNlayerCompatibilityChecker():
-            QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d layer layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
+        if self.layer_type == "Convolution 2d Transpose" and self.RNNlayerCompatibilityChecker():
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Convolution 2d transpose layer because an RNN layer is in (Simple RNN, LSTM, or GRU)")
             return
         
         if (self.layer_type == "Simple RNN" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "Simple RNN" and self.RNNlayerCompatibilityChecker()):
-            QMessageBox.warning(self, "Invalid Layer", "Cannot add Simple RNN layer because something besides Dense and Flatten is in.")
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add Simple RNN layer because a recurrent, convolutional, or pooling layer is present.")
             return
         
         if (self.layer_type == "LSTM" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "LSTM" and self.RNNlayerCompatibilityChecker()):
-            QMessageBox.warning(self, "Invalid Layer", "Cannot add LSTM layer because something besides Dense and Flatten is in.")
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add LSTM layer because a recurrent, convolutional, or pooling layer is present.")
             return
         
         if (self.layer_type == "GRU" and self.CNNlayerCompatibilityChecker()) or (self.layer_type == "GRU" and self.RNNlayerCompatibilityChecker()):
-            QMessageBox.warning(self, "Invalid Layer", "Cannot add GRU layer because something besides Dense and Flatten is in.")
+            QMessageBox.warning(self, "Invalid Layer", "Cannot add GRU layer because a recurrent, convolutional, or pooling layer is present.")
             return
 
         if(self.layer_location == "Beginning of list"):
