@@ -268,7 +268,7 @@ class ConfigureAddLayerDialog(QDialog):
         layout.addWidget(dense_desc_label)
         
         #validator for text box input (regex)
-        validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
+        validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,4}$'))
 
         units_label = QLabel("\u24D8 Units:")
         units_label.setToolTip("Positive integer, dimensionality of the output space")
@@ -1801,7 +1801,7 @@ class EditLayerDialog(QDialog):
         layout.addWidget(dense_desc_label)
 
         #validator for text box input (regex)
-        validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,2}$'))
+        validator = QRegularExpressionValidator(QRegularExpression(r'^\d{1,4}$'))
 
         units_label = QLabel("\u24D8 Units:")
         units_label.setToolTip("Positive integer, dimensionality of the output space")
